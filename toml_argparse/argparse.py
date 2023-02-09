@@ -69,7 +69,9 @@ class ArgumentParser(argparse.ArgumentParser):
 
         return default_args, cmdl_args
 
-    def _find_changed_args(self, default_args: argparse.Namespace, sys_args: argparse.Namespace) -> Dict[str, Any]:
+    def _find_changed_args(
+        self, default_args: argparse.Namespace, sys_args: argparse.Namespace
+    ) -> Dict[str, Any]:
         """Find the arguments that have been changed from the command
         line to replace the .toml arguments"""
         default_dict = vars(default_args)
@@ -82,7 +84,9 @@ class ArgumentParser(argparse.ArgumentParser):
 
         return changed_dict
 
-    def _pop_keys(self, namespace: argparse.Namespace, keys: List[Any]) -> argparse.Namespace:
+    def _pop_keys(
+        self, namespace: argparse.Namespace, keys: List[Any]
+    ) -> argparse.Namespace:
         """Remove the keys from the argparse namespace that are not used by
         the parser"""
         for key in keys:
@@ -102,7 +106,6 @@ class ArgumentParser(argparse.ArgumentParser):
         new_dict = {}
         for key, value in dictionary.items():
             if not isinstance(value, dict):
-                # breakpoint()
                 new_dict[key] = value
         return new_dict
 
