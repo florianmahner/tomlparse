@@ -1,6 +1,6 @@
 site_name: toml-argparse
 repo_url: https://github.com/florianmahner/toml-argparse
-site_url: https://florianmahner.github.io/toml-argparse
+site_url: https://toml-argparse.github.io
 site_description: This is a template repository for Python projects that use Poetry for their dependency management.
 site_author: florianmahner
 edit_uri: edit/main/docs/
@@ -21,7 +21,7 @@ plugins:
 theme:
   name: material
   feature:
-    tabs: true
+    tabs: false
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
