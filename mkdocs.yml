@@ -9,7 +9,6 @@ copyright: Maintained by <a href="https://florianmahner.com">Florian</a>.
 
 nav:
   - Home: index.md
-  - Modules: modules.md
 plugins:
   - search
   - mkdocstrings:
