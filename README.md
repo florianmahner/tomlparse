@@ -59,5 +59,16 @@ python experiment.py --config "example.toml"
 
 This will replace our argparse defaults with the ones specified in the toml file.
 
+
+## Contributing
+Clone the repository first. Then, install the environment and the pre-commit hooks with
+
+```bash
+make install
+```
+
+The CI/CD pipeline will be triggered when you open a pull request, merge to main, or when you create a new release.
+
 ---
+
 Repository initiated with [fpgmaas/cookiecutter-poetry](https://github.com/fpgmaas/cookiecutter-poetry).
