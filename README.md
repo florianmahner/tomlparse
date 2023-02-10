@@ -7,11 +7,57 @@
 [![License](https://img.shields.io/github/license/florianmahner/toml-argparse)](https://img.shields.io/github/license/florianmahner/toml-argparse)
 ![code style](https://img.shields.io/badge/code%20style-black-black)
 
-This is a template repository for Python projects that use Poetry for their dependency management.
+
+
+Command-line-tool to use [toml](https://toml.io/en/) files in combinations with [argparse](https://docs.python.org/3/library/argparse.html).
+
 
 - **Github repository**: <https://github.com/florianmahner/toml-argparse/>
 - **Documentation** <https://florianmahner.github.io/toml-argparse/>
 
 
+## Example
 
+[toml](https://toml.io/en/) files usually come in the following form:
+
+```toml
+# This is a TOML document
+title = "TOML Example"
+
+[owner]
+name = "Florian P. Mahner"
+id = 20
+```
+
+Say we want to use most of the fields from the toml file also for our python project. To do this we would commonly build an ArgumentParser with the following fields:
+
+```python
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--title", type=str, default="")
+parser.add_argument("--name", type=str, default="")
+parser.add_argument("--id", type=int, default=0)
+parser.parse_args()
+```
+
+For large projects with a lot of hyperparameters the number of arguments can become very large (especially for deep learning projects). To create reproducible experiments, we can now use the `toml_argparse.ArgumentParser()` to parse the toml arguments:
+
+```python
+from toml_argparse import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--title", type=str, default="")
+parser.add_argument("--name", type=str, default="")
+parser.add_argument("--id", type=int, default=0)
+parser.parse_args()
+```
+
+We can then parse the toml file from the command line:
+
+```bash
+python experiment.py --config "example.toml"
+```
+
+This will replace our argparse defaults with the ones specified in the toml file.
+
+---
 Repository initiated with [fpgmaas/cookiecutter-poetry](https://github.com/fpgmaas/cookiecutter-poetry).
