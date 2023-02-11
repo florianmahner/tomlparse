@@ -6,44 +6,35 @@ import toml
 
 
 class ArgumentParser(argparse.ArgumentParser):
-    """Convenience warpper around `argparse.ArgumentParser` that accepts
-    TOML files as input"""
+    """A warpper of the argparse.ArgumentParser class that adds the ability to
+    specify the values for arguments using a TOML file.
+
+    This class extends the functionality of the standard argparse.ArgumentParser by allowing
+    users to specify default values for arguments in a TOML file, in addition to the command line.
+    We can use all functionalities from the argument parser as usual:
+
+    Example:
+        >>> from toml_argpare import ArgumentParser
+        >>> parser = ArgumentParser(description='Example argparse-toml app')
+        >>> parser.add_argument('--foo', type=int, help='An example argument')
+        >>> args = parser.parse_args()
+
+    The above code will work as with the standard argparse.ArgumentParser class. We can also
+    specify the default values for the arguments in a TOML file. For this the TOML ArgumentParser
+    has two additional arguments: `--config` and `--section`. The `--config` argument is used
+    to specify the path to the TOML file, and the `--section` argument is used to specify the
+    section name in the TOML file to parse the arguments from. If the `--section` argument is
+    not specified, the arguments are parsed from the root of the TOML file.
+
+    We have the following hierarchy of arguments:
+        1. Arguments passed through the command line are selected over TOML
+           arguments, even if both are passed
+        2. Arguments from the TOML file are preferred over the default arguments
+        3. Arguments from the TOML with a section override the arguments without
+           a section
+    """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        """
-        This class adds two optional arguments to the `argparse.ArgumentParser`:
-        `--config` and `--section`.
-        The `--config` argument specifies the path to a configuration file in the
-        TOML format, and the `--section` argument specifies the name of a section
-        in the configuration file. If `--config`is not provided, the default values
-        specified add to the ` argparse.ArgumentParser` object will be used.
-        If `--section` is not provided, all the arguments that do not have a
-        section in the configuration file will be used.
-
-        We have the following hierarchy of arguments:
-            1. Arguments passed through the command line are selected over TOML
-            arguments, even if both are passed
-            2. Arguments from the TOML file are preferred over the default arguments
-            3. Arguments from the TOML with a section override the arguments without
-            a section
-
-        Example of a TOML configuration file without a section:
-        argument_1 = "value_1"
-        argument_2 = "value_2"
-
-        Example of a TOML configuration file with a section:
-        [section_name]
-        argument_1 = "value_1"
-        argument_2 = "value_2"
-
-        Here `argument_1` in [section_name] will override `argument_1` without
-        a section.
-
-        Args:
-            *args: Positional arguments.
-            **kwargs: Keyword arguments.
-        """
-
         super().__init__(*args, **kwargs)
         self.add_argument(
             "--config",
@@ -102,7 +93,9 @@ class ArgumentParser(argparse.ArgumentParser):
         return config
 
     def _remove_nested_keys(self, dictionary: Dict[str, Any]) -> Dict[str, Any]:
-        """Remove nested keys from a dictionary during iterations on the fly"""
+        """Remove nested keys from a dictionary during iterations on the fly. This removes
+        all section arguments from the dictionary, unless they are passed in the command line
+        """
         new_dict = {}
         for key, value in dictionary.items():
             if not isinstance(value, dict):
