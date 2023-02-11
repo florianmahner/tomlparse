@@ -11,7 +11,8 @@
 
 toml-argparse is a python library and command-line-tool that allows you to use TOML configuration files with the argparse module. It provides a simple and convenient way to handle configuration for your python scripts, leveraging the strengths of both TOML and argparse.
 
-Installation
+## Installation
+
 You can install the library using pip
 
 ```bash
