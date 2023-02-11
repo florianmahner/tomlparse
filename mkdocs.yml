@@ -7,7 +7,7 @@ repo_name: florianmahner/toml-argparse
 copyright: Maintained by <a href="https://mahner.space">Florian</a>.
 
 nav:
-  - Home: README.me
+  - Home: README.md
 plugins:
   - search
   - include-markdown
