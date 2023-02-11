@@ -1,23 +1,31 @@
 site_name: toml-argparse
 repo_url: https://github.com/florianmahner/toml-argparse
 site_url: https://toml-argparse.github.io
-site_description: This is a template repository for Python projects that use Poetry for their dependency management.
 site_author: florianmahner
 edit_uri: edit/main/docs/
 repo_name: florianmahner/toml-argparse
-copyright: Maintained by <a href="https://florianmahner.com">Florian</a>.
+copyright: Maintained by <a href="https://mahner.space">Florian</a>.
 
 nav:
-  - Home: ../README.md
+  - Home: index.md
 plugins:
   - search
-  - include-markdown
+  - include-markdown:
+      opening_tag: "{!"
+      closing_tag: "!}"
+      encoding: ascii
+      preserve_includer_indent: false
+      dedent: true
+      trailing_newlines: false
+      comments: false
   - mkdocstrings:
       handlers:
         python:
             setup_commands:
                 - import sys
-                - sys.path.append('../')
+                - sys.path.append('../
+            options:
+              show_source: true
 theme:
   name: material
   feature:
