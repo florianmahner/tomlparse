@@ -5,7 +5,7 @@ description = "This is a template repository for Python projects that use Poetry
 authors = ["florianmahner <fflorian.mahner@gmail.com>"]
 repository = "https://github.com/florianmahner/toml-argparse"
 documentation = "https://florianmahner.github.io/toml-argparse/"
-readme = "docs/README.md"
+readme = "README.md"
 packages = [
   {include = "toml_argparse"}
 ]

@@ -10,14 +10,7 @@ nav:
   - Home: index.md
 plugins:
   - search
-  - include-markdown:
-      opening_tag: "{!"
-      closing_tag: "!}"
-      encoding: ascii
-      preserve_includer_indent: false
-      dedent: true
-      trailing_newlines: false
-      comments: false
+  - include-markdown
   - mkdocstrings:
       handlers:
         python:

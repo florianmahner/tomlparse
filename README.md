@@ -62,7 +62,7 @@ This will replace our argparse defaults with the ones specified in the toml file
 
 ## Contributing
 
-Please have a look at the contribution guidlines [here](./CONTRIBUTING.rst).
+Please have a look at the contribution guidlines in `Contributing.rst`.
 
 ---
 
