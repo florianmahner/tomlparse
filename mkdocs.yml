@@ -11,6 +11,8 @@ nav:
   - Home: index.md
 plugins:
   - search
+  - include-markdown
+  - section-inde
   - mkdocstrings:
       handlers:
         python:
