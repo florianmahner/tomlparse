@@ -9,14 +9,20 @@
 
 
 
-Command-line-tool to use [toml](https://toml.io/en/) files in combinations with [argparse](https://docs.python.org/3/library/argparse.html).
+toml-argparse is a python library and command-line-tool that allows you to use TOML configuration files with the argparse module. It provides a simple and convenient way to handle configuration for your python scripts, leveraging the strengths of both TOML and argparse.
+
+Installation
+You can install the library using pip
+
+```bash
+pip install toml-argparse
+```
 
 
-- **Github repository**: <https://github.com/florianmahner/toml-argparse/>
-- **Documentation** <https://florianmahner.github.io/toml-argparse/>
 
+## Usage
 
-## Example
+Using toml-argparse is straightforward and requires only a few extra steps compared to using argparse alone. You first define your configuration options in a TOML file, then use the `toml_argparse.ArgumentParser` to add those options to your argparse argument parser. 
 
 [toml](https://toml.io/en/) files usually come in the following form:
 
