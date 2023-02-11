@@ -1,1 +1,1 @@
-{% include-markdown "../README.md" rewrite-relative-urls=false %}
+{% include-markdown "./README.md" rewrite-relative-urls=false %}
