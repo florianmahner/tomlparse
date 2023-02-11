@@ -23,47 +23,40 @@ pip install toml-argparse
 
 ## Usage
 
-Using toml-argparse is straightforward and requires only a few extra steps compared to using argparse alone. You first define your configuration options in a TOML file, then use the `toml_argparse.ArgumentParser` to add those options to your argparse argument parser. 
+Using toml-argparse is straightforward and requires only a few extra steps compared to using argparse alone. You first define your configuration options in a TOML file, then use the [toml_argparse.ArgumentParser](https://github.com/florianmahner/toml-argparse/blob/main/toml_argparse/argparse.py) to add those options to your argparse argument parser. 
 
-[toml](https://toml.io/en/) files usually come in the following form:
+
+### Basic Example
+[TOML](https://toml.io/en/) files usually come in the following form:
 
 ```toml
-# This is a TOML document
-title = "TOML Example"
+# This is a TOML File
 
-[owner]
-name = "Florian P. Mahner"
-id = 20
+# These are parameters not part of a section
+foo = 10
+bar = "hello"
+
+# This is a parameter that belongs to a section
+[general]
+foo = 42
 ```
 
-Say we want to use most of the fields from the toml file also for our python project. To do this we would commonly build an ArgumentParser with the following fields:
-
-```python
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("--title", type=str, default="")
-parser.add_argument("--name", type=str, default="")
-parser.add_argument("--id", type=int, default=0)
-parser.parse_args()
-```
-
-For large projects with a lot of hyperparameters the number of arguments can become very large (especially for deep learning projects). To create reproducible experiments, we can now use the `toml_argparse.ArgumentParser()` to parse the toml arguments:
+Say we want to use the fields from the TOML file also for our python project. To do this we would create an `ArgumentParser` as usual:
 
 ```python
 from toml_argparse import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("--title", type=str, default="")
-parser.add_argument("--name", type=str, default="")
-parser.add_argument("--id", type=int, default=0)
+parser.add_argument("--foo", type-int, default=0)
+parser.add_argumetn("--bar", type=str, default="")
 parser.parse_args()
 ```
 
-We can then parse the toml file from the command line:
+This is just a very simple example with two arguments. For large projects with a lot of hyperparameters the number of arguments usually increases quickly. In this case, we can now easily parse parameters through the TOML file from the command-line:
+
 
 ```bash
 python experiment.py --config "example.toml"
 ```
-
 This will replace our argparse defaults with the ones specified in the toml file.
 
 
