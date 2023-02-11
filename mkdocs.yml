@@ -8,11 +8,11 @@ repo_name: florianmahner/toml-argparse
 copyright: Maintained by <a href="https://florianmahner.com">Florian</a>.
 
 nav:
-  - Home: index.md
+  - Home: ../README.md
 plugins:
   - search
+  - section-index
   - include-markdown
-  - section-inde
   - mkdocstrings:
       handlers:
         python:
