@@ -26,7 +26,7 @@ theme:
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: white
+      primary: black
       accent: deep orange
       toggle:
         icon: material/brightness-7
