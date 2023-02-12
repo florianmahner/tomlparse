@@ -8,8 +8,16 @@
 ![code style](https://img.shields.io/badge/code%20style-black-black)
 
 
+toml-argparse is a Python library and command-line tool that allows you to use [TOML](https://toml.io/en/) configuration files in conjunction with the [argparse module](https://docs.python.org/3/library/argparse.html), providing a simple and convenient way to handle configuration for your Python scripts. The library leverages the strengths of both TOML and argparse to offer a flexible and powerful solution for managing your project configurations.
 
-toml-argparse is a python library and command-line-tool that allows you to use [TOML](https://toml.io/en/) configuration files with the [argparse](https://docs.python.org/3/library/argparse.html) module. It provides a simple and convenient way to handle configuration for your python scripts, leveraging the strengths of both TOML and argparse.
+
+§# Table of Contents
+1. [Installation](#Installation)
+2. [Usage](#usage)
+3. [Basic Example](#basic-example)
+4. [Extended Example](#extended-example)
+5. Contributing
+
 
 ## Installation
 
@@ -45,7 +53,7 @@ parser.add_argumetn("--bar", type=str, default="")
 parser.parse_args()
 ```
 
-This is just a very simple example with two arguments. However, for large projects with a lot of hyperparameters the number of arguments usually increases quickly and the TOML file provides an easy way to collect and store different hyperparameter configurations. We can do this by parsing  parameters from the TOML file from the command-line:
+This is just a simple example with two arguments. But for larger projects with many hyperparameters, the number of arguments can quickly grow, and the TOML file provides an easy way to collect and store different hyperparameter configurations. To parse parameters from the TOML file, you would use the following command-line syntax:
 
 ```bash
 python experiment.py --config "example.toml"
@@ -53,7 +61,7 @@ python experiment.py --config "example.toml"
 
 ### Extended Example
 
-TOML files have the power to separate arguments into different sections that are represented by nested dictionaries:
+TOML files have the ability to separate arguments into different sections, which are represented by nested dictionaries:
 
 ```toml
 # This is a TOML File
@@ -66,13 +74,13 @@ bar = "hello"
 foo = 20
 ```
 
-If we would load this TOML file as usual this would return a dict {"foo": 10, "bar": "hello", "general": {"foo": 20}. Note that foo is overloaded and defined twice. We can also load arguments from a specific section through the corresponding keyword `section`:
+If you load this TOML file as usual, it would return the following dictionary: `{"foo": 10, "bar": "hello", "General": {"foo": 20}}`. Note that `foo` is overloaded and defined twice. To load arguments from a specific section, you can use the corresponding section keyword:
 
 ```bash
 python experiment.py --config "example.toml" --section "general"
 ```
 
-This would return the following dict {"foo": 20, "bar": "hello"}. Note that section arguments override arguments without a section.
+This would return the following dict `{"foo": 20, "bar": "hello"}`. Note that section arguments override arguments without a section.
 
 In general, we have the following hierarchy of arguments:
 1. Arguments passed through the command line are selected over TOML
