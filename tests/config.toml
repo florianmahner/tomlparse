@@ -1,0 +1,7 @@
+# These are general arguments without a section
+foo = 10
+bar = "hello"
+
+# This is a section
+[general]
+foo = 20
