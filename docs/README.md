@@ -8,8 +8,16 @@
 ![code style](https://img.shields.io/badge/code%20style-black-black)
 
 
+toml-argparse is a Python library and command-line tool that allows you to use [TOML](https://toml.io/en/) configuration files in conjunction with the [argparse module](https://docs.python.org/3/library/argparse.html), providing a simple and convenient way to handle configuration for your Python scripts. The library leverages the strengths of both TOML and argparse to offer a flexible and powerful solution for managing your project configurations.
 
-toml-argparse is a python library and command-line-tool that allows you to use [TOML](https://toml.io/en/) configuration files with the [argparse](https://docs.python.org/3/library/argparse.html) module. It provides a simple and convenient way to handle configuration for your python scripts, leveraging the strengths of both TOML and argparse.
+
+# Table of Contents
+1. [Installation](#installation)
+2. [Usage](#usage)
+    1. [Basic Example](#basic-example)
+    2. [Extended Example](#extended-example)
+5. [Contributing](#contributing)
+
 
 ## Installation
 
@@ -45,7 +53,7 @@ parser.add_argumetn("--bar", type=str, default="")
 parser.parse_args()
 ```
 
-This is just a very simple example with two arguments. However, for large projects with a lot of hyperparameters the number of arguments usually increases quickly and the TOML file provides an easy way to collect and store different hyperparameter configurations. We can do this by parsing  parameters from the TOML file from the command-line:
+This is just a simple example with two arguments. But for larger projects with many hyperparameters, the number of arguments can quickly grow, and the TOML file provides an easy way to collect and store different hyperparameter configurations. To parse parameters from the TOML file, you would use the following command-line syntax:
 
 ```bash
 python experiment.py --config "example.toml"
@@ -53,7 +61,7 @@ python experiment.py --config "example.toml"
 
 ### Extended Example
 
-TOML files have the power to separate arguments into different sections (called `tables`) that are represented by nested dictionaries:
+TOML files have the ability to separate arguments into different sections (called `tables`), which are represented by nested dictionaries:
 
 ```toml
 # This is a TOML File
