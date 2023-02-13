@@ -24,7 +24,7 @@ theme:
   feature:
     tabs: false
   palette:
-    - media: "(prefers-color-scheme: light)"
+    - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: black
       accent: deep orange
