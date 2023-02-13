@@ -8,7 +8,7 @@
 ![code style](https://img.shields.io/badge/code%20style-black-black)
 
 
-toml-argparse is a Python library and command-line tool that allows you to use [TOML](https://toml.io/en/) configuration files in conjunction with the [argparse module](https://docs.python.org/3/library/argparse.html), providing a simple and convenient way to handle configuration for your Python scripts. The library leverages the strengths of both TOML and argparse to offer a flexible and powerful solution for managing your project configurations.
+toml-argparse is a Python library and command-line tool that allows you to use [TOML](https://toml.io/en/) configuration files in conjunction with the [argparse module](https://docs.python.org/3/library/argparse.html). It provides a simple and convenient way to handle your python projects, leveraging the strengths of both TOML and argparse.
 
 
 # Table of Contents
@@ -30,20 +30,19 @@ pip install toml-argparse
 
 ## Usage
 
-Using toml-argparse is straightforward and requires only a few extra steps compared to using argparse alone. You first define your configuration options in a TOML file, then use the [TOML ArgumentParser](https://github.com/florianmahner/toml-argparse/blob/main/toml_argparse/argparse.py). 
+Using toml-argparse is straightforward and requires only a few extra steps compared to using argparse alone.
 
 ### Basic Example
 
-[TOML](https://toml.io/en/) files usually come in the following form:
+You first define your configuration options in a TOML file. TOML files have the advantage of being highly flexible and includes a lot of native types. Have look [here](https://toml.io/en/v1.0.0) for an extensive list.  TOML files usually come in the following form:
 
 ```toml
-# This is a very basic TOML file without a section
+# This is a very basic TOML file
 foo = 10
 bar = "hello"
 ```
 
-
-The [TOML ArgumentParser](https://github.com/florianmahner/toml-argparse/blob/main/toml_argparse/argparse.py) is a simple wrapper of the original argparse module. It therefore provides the exact same fumctionality. To use the TOML arguments for our project, we we would create an `ArgumentParser` as usual:
+At the core of this module is the  [TOML ArgumentParser](https://github.com/florianmahner/toml-argparse/blob/main/toml_argparse/argparse.py), a simple wrapper of the original argparse module. To use the TOML arguments for our project, we we would create an `ArgumentParser` as usual:
 
 ```python
 from toml_argparse import argparse
@@ -53,11 +52,13 @@ parser.add_argumetn("--bar", type=str, default="")
 parser.parse_args()
 ```
 
-This is just a simple example with two arguments. But for larger projects with many hyperparameters, the number of arguments can quickly grow, and the TOML file provides an easy way to collect and store different hyperparameter configurations. To parse parameters from the TOML file, you would use the following command-line syntax:
+This is just a simple example with two arguments. But for larger projects with many hyperparameters, the number of arguments can quickly grow, and the TOML file provides an easy way to collect and store different hyperparameter configurations. Every TOML ArgumentParser has a `config` argument defined that we can pass using the follwing command-line syntax:
 
 ```bash
 python experiment.py --config "example.toml"
 ```
+
+This will replace the default values from the ArgumentParser with the TOML values.
 
 ### Extended Example
 
@@ -74,25 +75,29 @@ bar = "hello"
 [general]
 foo = 20
 
+# These arguments are part of the table [root]
 [root]
 bar = "hey"
 ```
 
-If we would load this TOML file as usual this would return a dict {"foo": 10, "bar": "hello", "general": {"foo": 20}. Note that foo is overloaded and defined twice. We can also specify the `table` and `root-table` commands to load specific arguments:
+If we would load this TOML file as usual this would return a dict `{"foo": 10, "bar": "hello", "general": {"foo": 20}, "root" : {"bar": "hey"}}`. Note that `foo` and `bar` are overloaded and defined twice. To specify the values we wish to take each TOML ArgumentParser has two arguments defined:
+
+1. `table`
+2. `root-table`
+
+We can use these directly from the command-line:
 
 ```bash
 python experiment.py --config "example.toml" --table "general"
 ```
 
-In this case the `root-table` is taken from the top of the file and parsing would return the following dict {"foo": 20, "bar": "hello"}. Note that table arguments override arguments from the root-table. We can also specify the root-table:
+In this case the `root-table` is not defined. Therefore the arguments at the top of the file without a table are taken and parsing would return the following dict `{"foo": 20, "bar": "hello"}`. Note that `table` arguments override arguments from the `root-table`. We can also specify the root-table:
 
 ```bash
 python experiment.py --config "example.toml" --table "general" --root-table "root"
 ```
 
-which would return the following dict {"foo: 20", "bar": "hey"}.
-
-
+which would return the following dict `{"foo: 20", "bar": "hey"}` and override the arguments from the top of the TOML file.
 
 In general, we have the following hierarchy of arguments:
 1. Arguments passed through the command line are selected over TOML
@@ -101,7 +106,6 @@ In general, we have the following hierarchy of arguments:
 3. Arguments from the TOML with a section override the arguments without a section
 
 This means that we can also override arguments in the TOML file from the command-line:
-
 
 ```bash
 python experiment.py --config "example.toml" --section "general" --foo 100
