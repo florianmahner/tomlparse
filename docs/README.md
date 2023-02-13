@@ -53,26 +53,38 @@ python experiment.py --config "example.toml"
 
 ### Extended Example
 
-TOML files have the power to separate arguments into different sections that are represented by nested dictionaries:
+TOML files have the power to separate arguments into different sections (called `tables`) that are represented by nested dictionaries:
 
 ```toml
 # This is a TOML File
 
-# These are parameters not part of a section
+# Parameters without a prededing [] are not part of a table (called root-table)
 foo = 10
 bar = "hello"
 
+# These arguments are part of the table [general]
 [general]
 foo = 20
+
+[root]
+bar = "hey"
 ```
 
-If we would load this TOML file as usual this would return a dict {"foo": 10, "bar": "hello", "general": {"foo": 20}. Note that foo is overloaded and defined twice. We can also load arguments from a specific section through the corresponding keyword `section`:
+If we would load this TOML file as usual this would return a dict {"foo": 10, "bar": "hello", "general": {"foo": 20}. Note that foo is overloaded and defined twice. We can also specify the `table` and `root-table` commands to load specific arguments:
 
 ```bash
-python experiment.py --config "example.toml" --section "general"
+python experiment.py --config "example.toml" --table "general"
 ```
 
-This would return the following dict {"foo": 20, "bar": "hello"}. Note that section arguments override arguments without a section.
+In this case the `root-table` is taken from the top of the file and parsing would return the following dict {"foo": 20, "bar": "hello"}. Note that table arguments override arguments from the root-table. We can also specify the root-table:
+
+```bash
+python experiment.py --config "example.toml" --table "general" --root-table "root"
+```
+
+which would return the following dict {"foo: 20", "bar": "hey"}.
+
+
 
 In general, we have the following hierarchy of arguments:
 1. Arguments passed through the command line are selected over TOML

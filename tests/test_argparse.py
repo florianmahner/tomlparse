@@ -19,12 +19,12 @@ class TestArgparse(unittest.TestCase):
             "test_argparse.py",
             "--config",
             "config.toml",
-            "--section",
+            "--table",
             "general",
         ]
         default_args, sys_args = parser._extract_args()
         changed_args = parser._find_changed_args(default_args, sys_args)
-        self.assertEqual(changed_args, {"config": "config.toml", "section": "general"})
+        self.assertEqual(changed_args, {"config": "config.toml", "table": "general"})
 
     def test_pop_keys(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
@@ -32,13 +32,18 @@ class TestArgparse(unittest.TestCase):
             "test_argparse.py",
             "--config",
             "config.toml",
-            "--section",
+            "--table",
             "general",
+            "--root-table",
+            "main",
         ]
         default_args, sys_args = parser._extract_args()
         changed_args = parser._find_changed_args(default_args, sys_args)
-        self.assertEqual(changed_args, {"config": "config.toml", "section": "general"})
-        parser._pop_keys(sys_args, ["config", "section"])
+        self.assertEqual(
+            changed_args,
+            {"config": "config.toml", "table": "general", "root_table": "main"},
+        )
+        parser._pop_keys(sys_args, ["config", "table", "root_table"])
         self.assertEqual(vars(sys_args), {})
 
     def test_remove_nested_keys(self):
@@ -47,16 +52,24 @@ class TestArgparse(unittest.TestCase):
             "test_argparse.py",
             "--config",
             "config.toml",
-            "--section",
+            "--table",
             "general",
+            "--root-table",
+            "main",
         ]
         default_args, sys_args = parser._extract_args()
         changed_args = parser._find_changed_args(default_args, sys_args)
-        self.assertEqual(changed_args, {"config": "config.toml", "section": "general"})
-        parser._pop_keys(sys_args, ["config", "section"])
+        self.assertEqual(
+            changed_args,
+            {"config": "config.toml", "table": "general", "root_table": "main"},
+        )
+        parser._pop_keys(sys_args, ["config", "table", "root_table"])
         self.assertEqual(vars(sys_args), {})
         config = parser.load_from_toml("./tests/config.toml")
-        self.assertEqual(config, {"foo": 10, "bar": "hello", "general": {"foo": 20}})
+        self.assertEqual(
+            config,
+            {"foo": 10, "bar": "hello", "general": {"foo": 20}, "main": {"bar": "hey"}},
+        )
         config = parser._remove_nested_keys(config)
         self.assertEqual(config, {"foo": 10, "bar": "hello"})
 
@@ -82,7 +95,7 @@ class TestArgparse(unittest.TestCase):
             "test_argparse.py",
             "--config",
             "./tests/config.toml",
-            "--section",
+            "--table",
             "general",
         ]
         args = parser.parse_args()
@@ -101,7 +114,7 @@ class TestArgparse(unittest.TestCase):
             "test_argparse.py",
             "--config",
             "./tests/config.toml",
-            "--section",
+            "--table",
             "missing",
         ]
         with self.assertRaises(KeyError):
@@ -120,7 +133,7 @@ class TestArgparse(unittest.TestCase):
             "test_argparse.py",
             "--config",
             "./tests/config.toml",
-            "--section",
+            "--table",
             "general",
         ]
         parser.add_argument("--foo", type=int, default=0)
@@ -130,6 +143,24 @@ class TestArgparse(unittest.TestCase):
         config = parser.load_from_toml("./tests/test_config.toml")
         os.remove("./tests/test_config.toml")
         self.assertEqual(vars(args), config)
+
+    def test_combined_section(self):
+        parser = argparse.ArgumentParser(description="Test ArgumentParser")
+        sys.argv = [
+            "test_argparse.py",
+            "--config",
+            "./tests/config.toml",
+            "--root-table",
+            "general",
+            "--table",
+            "main",
+        ]
+        parser.add_argument("--foo", type=int, default=0)
+        parser.add_argument("--bar", type=str, default="")
+        args = parser.parse_args()
+        self.assertEqual(args.foo, 20)
+        self.assertEqual(args.bar, "hey")
+        self.assertEqual(args.table, "main")
 
 
 if __name__ == "__main__":

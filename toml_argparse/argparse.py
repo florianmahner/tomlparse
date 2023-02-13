@@ -21,17 +21,19 @@ class ArgumentParser(argparse.ArgumentParser):
 
     The above code will work as with the standard argparse.ArgumentParser class. We can also
     specify the default values for the arguments in a TOML file. For this the TOML ArgumentParser
-    has two additional arguments: `--config` and `--section`. The `--config` argument is used
-    to specify the path to the TOML file, and the `--section` argument is used to specify the
-    section name in the TOML file to parse the arguments from. If the `--section` argument is
-    not specified, the arguments are parsed from the root of the TOML file.
+    has two additional arguments: `--config` and `--table`. The `--config` argument is used
+    to specify the path to the TOML file, and the `--table` argument is used to specify the
+    table name in the TOML file to parse the arguments from. A TOML table is defined by a [name]
+    in brackets preceding the arguments. If the `--table` argument is not specified, the arguments
+    are parsed from the root table of the TOML file. We can also change
+    the root table name by specifying the `--root_table` argument.
 
     We have the following hierarchy of arguments:
         1. Arguments passed through the command line are selected over TOML
            arguments, even if both are passed
         2. Arguments from the TOML file are preferred over the default arguments
-        3. Arguments from the TOML with a section override the arguments without
-           a section
+        3. Arguments from the TOML with a table override the arguments without
+           a table
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -43,10 +45,20 @@ class ArgumentParser(argparse.ArgumentParser):
             help="Path to the configuration file.",
         )
         self.add_argument(
-            "--section",
+            "--root-table",
             type=str,
             default="",
-            help="Section name in the config file to parse arguments from",
+            help="""Table in the config file that counts for all expriments. If not specified, then these
+            are the top-level arguments without a [table]""",
+        )
+        self.add_argument(
+            "--table",
+            type=str,
+            default="",
+            help=(
+                "Table name in the config file to parse arguments from in addition to"
+                " the root table"
+            ),
         )
 
     def _extract_args(self) -> Tuple[argparse.Namespace, argparse.Namespace]:
@@ -105,12 +117,13 @@ class ArgumentParser(argparse.ArgumentParser):
     def parse_args(self) -> argparse.Namespace:  # type: ignore[override]
         """Parse the arguments from the command line and the configuration file.
         If a section name is provided, only the arguments in that section will be
-        parsed from the .toml file"""
+        parsed from the .toml file
+        """
         default_args, sys_args = self._extract_args()
 
         # These are the default arguments options updated by the command line
         if not sys_args.config:
-            self._pop_keys(sys_args, ["section", "config"])
+            self._pop_keys(sys_args, ["root_table", "table", "config"])
             return sys_args
 
         # If a config file is passed, upodate the cmdl args with the config file unless
@@ -118,20 +131,30 @@ class ArgumentParser(argparse.ArgumentParser):
         config = self._load_toml(sys_args.config)
 
         changed_args = self._find_changed_args(default_args, sys_args)
-        if sys_args.section:
+        if sys_args.table:
             try:
-                section_name = sys_args.section
-                section_config = config[section_name]
+                table_name = sys_args.table
+                table_config = config[table_name]
             except KeyError as k:
                 raise KeyError from k
 
         else:
-            self._pop_keys(sys_args, ["section"])
-            section_config = config
-            section_config = self._remove_nested_keys(section_config)
+            self._pop_keys(sys_args, ["table"])
+            table_config = config
+            table_config = self._remove_nested_keys(table_config)
+
+        # If not empty and there exists a combined section, update the section configuto
+
+        if sys_args.root_table and config.get(sys_args.root_table):
+            table_config.update(config[sys_args.root_table])
+            sys_args.root_table = sys_args.root_table
+
+        # Else remove all other (irrelevant) sections
+        else:
+            self._remove_nested_keys(table_config)
 
         # This safely also ignores the section name in the nested dict
-        for key, value in section_config.items():
+        for key, value in table_config.items():
             if key not in default_args:
                 # Raise the default argparse error alongside the usage
                 self.error(f"unrecognized arguments: '{key}''")
@@ -139,7 +162,7 @@ class ArgumentParser(argparse.ArgumentParser):
             # If the key has been passed in the command line, do not overwrite the
             # command line argument with the toml argument, but vice versa.
             if key in changed_args:
-                section_config[key] = changed_args[key]
+                table_config[key] = changed_args[key]
             else:
                 setattr(sys_args, key, value)
 

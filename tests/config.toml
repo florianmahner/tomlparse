@@ -5,3 +5,6 @@ bar = "hello"
 # This is a section
 [general]
 foo = 20
+
+[main]
+bar = "hey"
