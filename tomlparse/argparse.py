@@ -6,7 +6,6 @@ of `argparse.ArgumentParser` by allowing users to specify default values for
 arguments in a TOML file, in addition to the command line. 
 """
 
-
 import argparse
 import sys
 from typing import Any, Dict, List, MutableMapping, Tuple
@@ -70,7 +69,7 @@ class ArgumentParser(argparse.ArgumentParser):
             ),
         )
 
-    def _extract_args(self) -> Tuple[argparse.Namespace, argparse.Namespace]:
+    def extract_args(self) -> Tuple[argparse.Namespace, argparse.Namespace]:
         """Find the default arguments of the argument parser if any and the
         ones that are passed through the command line"""
         sys_defaults = sys.argv.copy()
@@ -81,7 +80,7 @@ class ArgumentParser(argparse.ArgumentParser):
 
         return default_args, cmdl_args
 
-    def _find_changed_args(
+    def find_changed_args(
         self, default_args: argparse.Namespace, sys_args: argparse.Namespace
     ) -> Dict[str, Any]:
         """Find the arguments that have been changed from the command
@@ -93,30 +92,23 @@ class ArgumentParser(argparse.ArgumentParser):
             sys_value = sys_dict[key]
             if sys_value != value:
                 changed_dict[key] = sys_value
-
         return changed_dict
 
-    def _pop_keys(
+    def pop_keys_(
         self, namespace: argparse.Namespace, keys: List[Any]
     ) -> argparse.Namespace:
-        """Remove the keys from the argparse namespace that are not used by
-        the parser"""
+        """Removes unnecessary keys from the namespace"""
         for key in keys:
             delattr(namespace, key)
-        return namespace
 
-    def _load_toml(self, path: str) -> MutableMapping[str, Any]:
-        """Load the .toml file and return the config dictionary"""
+    def load_toml(self, path: str) -> MutableMapping[str, Any]:
         try:
             config = toml.load(path)
         except FileNotFoundError as f:
             raise FileNotFoundError from f
         return config
 
-    def _remove_nested_keys(self, dictionary: Dict[str, Any]) -> Dict[str, Any]:
-        """Remove nested keys from a dictionary during iterations on the fly. This removes
-        all section arguments from the dictionary, unless they are passed in the command line
-        """
+    def remove_nested_keys(self, dictionary: Dict[str, Any]) -> Dict[str, Any]:
         new_dict = {}
         for key, value in dictionary.items():
             if not isinstance(value, dict):
@@ -124,51 +116,50 @@ class ArgumentParser(argparse.ArgumentParser):
         return new_dict
 
     def parse_args(self) -> argparse.Namespace:  # type: ignore[override]
-        """Parse the arguments from the command line and the configuration file.
-        If a section name is provided, only the arguments in that section will be
-        parsed from the .toml file
-        """
-        default_args, sys_args = self._extract_args()
+        """Parse the arguments from the command line and the TOML file
+        and return the updated arguments. Same functionality as the
+        `argparse.ArgumentParser.parse_args` method."""
+        default_args, sys_args = self.extract_args()
+        table = sys_args.table
+        root_table = sys_args.root_table
+        config = sys_args.config
 
         # These are the default arguments options updated by the command line
-        if not sys_args.config:
-            self._pop_keys(sys_args, ["root_table", "table", "config"])
+        if not config:
+            self.pop_keys_(sys_args, ["root_table", "table", "config"])
             return sys_args
 
         # If a config file is passed, upodate the cmdl args with the config file unless
         # the argument is already specified in the command line
-        config = self._load_toml(sys_args.config)
+        config = self.load_toml(sys_args.config)
+        changed_args = self.find_changed_args(default_args, sys_args)
 
-        changed_args = self._find_changed_args(default_args, sys_args)
-        if sys_args.table:
+        if table:
             try:
-                table_name = sys_args.table
-                table_config = config[table_name]
-            except KeyError as k:
-                raise KeyError from k
+                table_config = config[table]
+            except KeyError as key:
+                raise KeyError from key
 
         else:
-            self._pop_keys(sys_args, ["table"])
+            self.pop_keys_(sys_args, ["table"])
             table_config = config
-            table_config = self._remove_nested_keys(table_config)
+            table_config = self.remove_nested_keys(table_config)
 
-        # If not empty and there exists a combined section, update the section configuto
-        if sys_args.root_table and config.get(sys_args.root_table):
-            table_config.update(config[sys_args.root_table])
-            sys_args.root_table = sys_args.root_table
-
-        # Else remove all other (irrelevant) sections
+        # If not empty and there exists a table and a root table, select the root
+        #  table config
+        if config.get(root_table):
+            table_config.update(config[root_table])
+        # Else merge the content without a table header
         else:
-            self._remove_nested_keys(table_config)
+            config = self.remove_nested_keys(config)
+            for key, value in config.items():
+                if (
+                    key not in table_config
+                ):  # we assing priority to the table if specified
+                    table_config[key] = value
 
-        # This safely also ignores the section name in the nested dict
+        # Overwrite the TOML config with the command line arguments
         for key, value in table_config.items():
-            if key not in default_args:
-                # Raise the default argparse error alongside the usage
-                self.error(f"unrecognized arguments: '{key}''")
-
-            # If the key has been passed in the command line, do not overwrite the
-            # command line argument with the toml argument, but vice versa.
             if key in changed_args:
                 table_config[key] = changed_args[key]
             else:
@@ -177,10 +168,8 @@ class ArgumentParser(argparse.ArgumentParser):
         return sys_args
 
     def write_to_toml(self, args: Dict[str, Any], path: str) -> None:
-        """Write the config dictionary to a .toml file"""
         with open(path, "w") as f:
             toml.dump(args, f)
 
     def load_from_toml(self, path: str) -> MutableMapping[str, Any]:
-        """Load the config dictionary from a .toml file"""
-        return self._load_toml(path)
+        return self.load_toml(path)
