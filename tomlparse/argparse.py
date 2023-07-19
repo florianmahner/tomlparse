@@ -65,7 +65,7 @@ class ArgumentParser(argparse.ArgumentParser):
             type=str,
             default="",
             help=(
-                "Table name in the config file to parse arguments from in addition to"
+                "Table name in the config file to parse arguments in addition to"
                 " the root table"
             ),
         )
