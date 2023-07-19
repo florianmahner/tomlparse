@@ -91,7 +91,7 @@ We can use these directly from the command-line:
 python experiment.py --config "example.toml" --table "general"
 ```
 
-In this case the `root-table` is not defined. In this case the arguments at the top of the file without a table are taken and parsing would return the following dict `{"foo": 20, "bar": "hello"}`. Note that `table` arguments override arguments from the `root-table`. 
+Here the `root-table` is not defined. In this case the arguments at the top of the file without a table are taken and parsing would return the following dict `{"foo": 20, "bar": "hello"}`. Note that `table` arguments override arguments from the `root-table`. 
 
 We can also specify the root-table:
 
