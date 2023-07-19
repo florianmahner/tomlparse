@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "toml_argparse"
+name = "tomlparse"
 version = "1.0.0"
 description = "This is a template repository for Python projects that use Poetry for their dependency management."
 authors = ["florianmahner <florian.mahner@gmail.com>"]
@@ -38,7 +38,7 @@ target-version = ['py37']
 preview = true
 
 [tool.mypy]
-files = ["toml_argparse"]
+files = ["tomlparse"]
 disallow_untyped_defs = "True"
 disallow_any_unimported = "True"
 no_implicit_optional = "True"

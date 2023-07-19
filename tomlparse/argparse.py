@@ -1,8 +1,8 @@
 """
 Module for parsing command line arguments and TOML configuration files.
 
-This module provides a class, ArgumentParser, which extends the functionality 
-of argparse.ArgumentParser by allowing users to specify default values for 
+This module provides a class, `ArgumentParser`, which extends the functionality 
+of `argparse.ArgumentParser` by allowing users to specify default values for 
 arguments in a TOML file, in addition to the command line. 
 """
 
@@ -23,8 +23,8 @@ class ArgumentParser(argparse.ArgumentParser):
     We can use all functionalities from the argument parser as usual:
 
     Example:
-        >>> from toml_argpare import ArgumentParser
-        >>> parser = ArgumentParser(description='Example argparse-toml app')
+        >>> from tomlparse import argparse
+        >>> parser = argparse.ArgumentParser(description='Example argparse-toml app')
         >>> parser.add_argument('--foo', type=int, help='An example argument')
         >>> args = parser.parse_args()
 
