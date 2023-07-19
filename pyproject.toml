@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "toml_argparse"
-version = "0.0.1"
+version = "1.0.0"
 description = "This is a template repository for Python projects that use Poetry for their dependency management."
-authors = ["florianmahner <fflorian.mahner@gmail.com>"]
-repository = "https://github.com/florianmahner/toml-argparse"
-documentation = "https://florianmahner.github.io/toml-argparse/"
+authors = ["florianmahner <florian.mahner@gmail.com>"]
+repository = "https://github.com/florianmahner/tomlparse"
+documentation = "https://florianmahner.github.io/tomlparse/"
 readme = "docs/README.md"
 packages = [
-  {include = "toml_argparse"}
+  {include = "tomlparse"}
 ]
 
 [tool.poetry.dependencies]
@@ -98,6 +98,6 @@ skip_empty = true
 
 [tool.coverage.run]
 branch = true
-source = ["toml_argparse"]
+source = ["tomlparse"]
 
 

@@ -1,3 +1,12 @@
+"""
+Module for parsing command line arguments and TOML configuration files.
+
+This module provides a class, ArgumentParser, which extends the functionality 
+of argparse.ArgumentParser by allowing users to specify default values for 
+arguments in a TOML file, in addition to the command line. 
+"""
+
+
 import argparse
 import sys
 from typing import Any, Dict, List, MutableMapping, Tuple
@@ -6,7 +15,7 @@ import toml
 
 
 class ArgumentParser(argparse.ArgumentParser):
-    """A warpper of the argparse.ArgumentParser class that adds the ability to
+    """A wrapper of the argparse.ArgumentParser class that adds the ability to
     specify the values for arguments using a TOML file.
 
     This class extends the functionality of the standard argparse.ArgumentParser by allowing
@@ -144,7 +153,6 @@ class ArgumentParser(argparse.ArgumentParser):
             table_config = self._remove_nested_keys(table_config)
 
         # If not empty and there exists a combined section, update the section configuto
-
         if sys_args.root_table and config.get(sys_args.root_table):
             table_config.update(config[sys_args.root_table])
             sys_args.root_table = sys_args.root_table
