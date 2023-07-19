@@ -8,7 +8,7 @@
 ![code style](https://img.shields.io/badge/code%20style-black-black)
 
 
-toml-argparse is a Python library and command-line tool that allows you to use [TOML](https://toml.io/en/) configuration files in conjunction with the [argparse module](https://docs.python.org/3/library/argparse.html). It provides a simple and convenient way to handle your python projects, leveraging the strengths of both TOML and argparse.
+tomlparse is a Python library and command-line tool that allows you to use [TOML](https://toml.io/en/) configuration files in conjunction with the [argparse module](https://docs.python.org/3/library/argparse.html). It provides a simple and convenient way to handle your python projects, leveraging the strengths of both TOML and argparse.
 
 
 # Table of Contents
@@ -24,13 +24,13 @@ toml-argparse is a Python library and command-line tool that allows you to use [
 You can install the library using pip
 
 ```bash
-pip install toml-argparse
+pip install tomlparse
 ```
 
 
 ## Usage
 
-Using toml-argparse is straightforward and requires only a few extra steps compared to using argparse alone.
+Using tomlparse is straightforward and requires only a few extra steps compared to using argparse alone.
 
 ### Basic Example
 
@@ -45,7 +45,7 @@ bar = "hello"
 At the core of this module is the  [TOML ArgumentParser](https://github.com/florianmahner/toml-argparse/blob/main/toml_argparse/argparse.py), a simple wrapper of the original argparse module. To use the TOML arguments for our project, we we would create an `ArgumentParser` as usual:
 
 ```python
-from toml_argparse import argparse
+from tomlparse import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--foo", type-int, default=0)
 parser.add_argumetn("--bar", type=str, default="")
