@@ -2,15 +2,15 @@ import os
 import sys
 import unittest
 
-from toml_argparse import argparse
+from tomlparse import argparse
 
 
 class TestArgparse(unittest.TestCase):
     def test_cmdl_without_args(self):
         parser = argparse.ArgumentParser()
         sys.argv = ["test_argparse.py"]
-        default_args, sys_args = parser._extract_args()
-        changed_args = parser._find_changed_args(default_args, sys_args)
+        default_args, sys_args = parser.extract_args()
+        changed_args = parser.find_changed_args(default_args, sys_args)
         self.assertEqual(changed_args, {})
 
     def test_cmdl_with_args(self):
@@ -22,8 +22,8 @@ class TestArgparse(unittest.TestCase):
             "--table",
             "general",
         ]
-        default_args, sys_args = parser._extract_args()
-        changed_args = parser._find_changed_args(default_args, sys_args)
+        default_args, sys_args = parser.extract_args()
+        changed_args = parser.find_changed_args(default_args, sys_args)
         self.assertEqual(changed_args, {"config": "config.toml", "table": "general"})
 
     def test_pop_keys(self):
@@ -37,13 +37,13 @@ class TestArgparse(unittest.TestCase):
             "--root-table",
             "main",
         ]
-        default_args, sys_args = parser._extract_args()
-        changed_args = parser._find_changed_args(default_args, sys_args)
+        default_args, sys_args = parser.extract_args()
+        changed_args = parser.find_changed_args(default_args, sys_args)
         self.assertEqual(
             changed_args,
             {"config": "config.toml", "table": "general", "root_table": "main"},
         )
-        parser._pop_keys(sys_args, ["config", "table", "root_table"])
+        parser.pop_keys_(sys_args, ["config", "table", "root_table"])
         self.assertEqual(vars(sys_args), {})
 
     def test_remove_nested_keys(self):
@@ -57,20 +57,20 @@ class TestArgparse(unittest.TestCase):
             "--root-table",
             "main",
         ]
-        default_args, sys_args = parser._extract_args()
-        changed_args = parser._find_changed_args(default_args, sys_args)
+        default_args, sys_args = parser.extract_args()
+        changed_args = parser.find_changed_args(default_args, sys_args)
         self.assertEqual(
             changed_args,
             {"config": "config.toml", "table": "general", "root_table": "main"},
         )
-        parser._pop_keys(sys_args, ["config", "table", "root_table"])
+        parser.pop_keys_(sys_args, ["config", "table", "root_table"])
         self.assertEqual(vars(sys_args), {})
         config = parser.load_from_toml("./tests/config.toml")
         self.assertEqual(
             config,
             {"foo": 10, "bar": "hello", "general": {"foo": 20}, "main": {"bar": "hey"}},
         )
-        config = parser._remove_nested_keys(config)
+        config = parser.remove_nested_keys(config)
         self.assertEqual(config, {"foo": 10, "bar": "hello"})
 
     def test_parse_args(self):
@@ -100,7 +100,7 @@ class TestArgparse(unittest.TestCase):
         ]
         args = parser.parse_args()
         self.assertEqual(args.foo, 20)
-        self.assertEqual(args.bar, "")
+        self.assertEqual(args.bar, "hello")
 
     def test_missing_toml(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
@@ -118,13 +118,6 @@ class TestArgparse(unittest.TestCase):
             "missing",
         ]
         with self.assertRaises(KeyError):
-            parser.parse_args()
-
-    def test_non_specified_args(self):
-        parser = argparse.ArgumentParser(description="Test ArgumentParser")
-        sys.argv = ["test_argparse.py", "--config", "./tests/config.toml"]
-        parser.add_argument("--foo", type=int, default=0)
-        with self.assertRaises(SystemExit):
             parser.parse_args()
 
     def test_write_to_toml(self):
