@@ -48,7 +48,7 @@ At the core of this module is the  [TOML ArgumentParser](https://github.com/flor
 from tomlparse import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--foo", type-int, default=0)
-parser.add_argumetn("--bar", type=str, default="")
+parser.add_argument("--bar", type=str, default="")
 parser.parse_args()
 ```
 
