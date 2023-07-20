@@ -16,6 +16,6 @@ COPY poetry.lock pyproject.toml /code/
 RUN poetry install --no-interaction --no-ansi --no-root --no-dev
 
 # Copy Python code to the Docker image
-COPY toml_argparse /code/toml_argparse/
+COPY tomlparse /code/tomlparse/
 
-CMD [ "python", "toml_argparse/foo.py"]
+CMD [ "python", "tomlparse/foo.py"]

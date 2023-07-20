@@ -42,7 +42,7 @@ foo = 10
 bar = "hello"
 ```
 
-At the core of this module is the  [TOML ArgumentParser](https://github.com/florianmahner/toml-argparse/blob/main/toml_argparse/argparse.py), a simple wrapper of the original argparse module. To use the TOML arguments for our project, we we would create an `ArgumentParser` as usual:
+At the core of this module is the  [TOML ArgumentParser](https://github.com/florianmahner/toml-argparse/blob/main/tomlparse/argparse.py), a simple wrapper of the original argparse module. To use the TOML arguments for our project, we we would create an `ArgumentParser` as usual:
 
 ```python
 from tomlparse import argparse
