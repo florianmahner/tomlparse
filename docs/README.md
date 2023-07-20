@@ -1,10 +1,10 @@
 # tomlparse
 
-[![Release](https://img.shields.io/github/v/release/florianmahner/toml-argparse)](https://img.shields.io/github/v/release/florianmahner/toml-argparse)
-[![Build status](https://img.shields.io/github/actions/workflow/status/florianmahner/toml-argparse/main.yml?branch=main)](https://github.com/florianmahner/toml-argparse/actions/workflows/main.yml?query=branch%3Amain)
+[![Release](https://img.shields.io/github/v/release/florianmahner/tomlparse)](https://img.shields.io/github/v/release/florianmahner/tomlparse)
+[![Build status](https://img.shields.io/github/actions/workflow/status/florianmahner/tomlparse/main.yml?branch=main)](https://github.com/florianmahner/toml-argparse/actions/workflows/main.yml?query=branch%3Amain)
 ![example workflow](https://github.com/florianmahner/tomlparse/actions/workflows/main.yml/badge.svg)
-[![codecov](https://codecov.io/gh/florianmahner/toml-argparse/branch/main/graph/badge.svg)](https://codecov.io/gh/florianmahner/toml-argparse)
-[![License](https://img.shields.io/github/license/florianmahner/toml-argparse)](https://img.shields.io/github/license/florianmahner/toml-argparse)
+[![codecov](https://codecov.io/gh/florianmahner/tomlparse/branch/main/graph/badge.svg)](https://codecov.io/gh/florianmahner/tomlparse)
+[![License](https://img.shields.io/github/license/florianmahner/tomlparse)](https://img.shields.io/github/license/florianmahner/tomlparse)
 ![code style](https://img.shields.io/badge/code%20style-black-black)
 
 
