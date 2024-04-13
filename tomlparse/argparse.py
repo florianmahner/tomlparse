@@ -7,7 +7,7 @@ arguments in a TOML file, in addition to the command line.
 """
 
 import argparse
-from typing import Any, Dict, List, MutableMapping, Tuple
+from typing import Any, Dict, List, MutableMapping, Optional, Tuple
 
 import toml
 
@@ -68,11 +68,13 @@ class ArgumentParser(argparse.ArgumentParser):
             ),
         )
 
-    def extract_args(self) -> Tuple[argparse.Namespace, argparse.Namespace]:
+    def extract_args(
+        self, args: Optional[List[str]] = None
+    ) -> Tuple[argparse.Namespace, argparse.Namespace]:
         """Find the default arguments of the argument parser if any and the
         ones that are passed through the command line"""
         default_args = super().parse_args([])
-        cmdl_args = super().parse_args()
+        cmdl_args = super().parse_args(args)
 
         return default_args, cmdl_args
 
@@ -111,11 +113,11 @@ class ArgumentParser(argparse.ArgumentParser):
                 new_dict[key] = value
         return new_dict
 
-    def parse_args(self) -> argparse.Namespace:  # type: ignore[override]
+    def parse_args(self, args: Optional[List[str]] = None) -> argparse.Namespace:  # type: ignore[override]
         """Parse the arguments from the command line and the TOML file
         and return the updated arguments. Same functionality as the
         `argparse.ArgumentParser.parse_args` method."""
-        default_args, sys_args = self.extract_args()
+        default_args, sys_args = self.extract_args(args)
         table = sys_args.table
         root_table = sys_args.root_table
         config = sys_args.config

@@ -1,4 +1,3 @@
-import os
 import sys
 import unittest
 
@@ -23,6 +22,18 @@ class TestArgparse(unittest.TestCase):
             "general",
         ]
         default_args, sys_args = parser.extract_args()
+        changed_args = parser.find_changed_args(default_args, sys_args)
+        self.assertEqual(changed_args, {"config": "config.toml", "table": "general"})
+
+    def test_cmdl_with_args_as_param(self):
+        parser = argparse.ArgumentParser(description="Test ArgumentParser")
+        args = [
+            "--config",
+            "config.toml",
+            "--table",
+            "general",
+        ]
+        default_args, sys_args = parser.extract_args(args)
         changed_args = parser.find_changed_args(default_args, sys_args)
         self.assertEqual(changed_args, {"config": "config.toml", "table": "general"})
 
