@@ -85,9 +85,7 @@ class ArgumentParser(argparse.ArgumentParser):
                 changed_dict[key] = sys_value
         return changed_dict
 
-    def pop_keys_(
-        self, namespace: argparse.Namespace, keys: List[Any]
-    ) -> argparse.Namespace:
+    def pop_keys_(self, namespace: argparse.Namespace, keys: List[Any]):
         """Removes unnecessary keys from the namespace"""
         for key in keys:
             delattr(namespace, key)
