@@ -9,7 +9,10 @@ arguments in a TOML file, in addition to the command line.
 import argparse
 from typing import Any, Dict, List, MutableMapping, Optional, Tuple
 
-import toml
+try:
+    import tomllib
+except ImportError:
+    import toml as tomllib
 
 
 class ArgumentParser(argparse.ArgumentParser):
@@ -87,7 +90,8 @@ class ArgumentParser(argparse.ArgumentParser):
 
     def load_toml(self, path: str) -> MutableMapping[str, Any]:
         try:
-            config = toml.load(path)
+            with open(path, "rb") as toml_fp:
+                config = tomllib.load(toml_fp)
         except FileNotFoundError:
             self.error(f'Configuration file "{path}" doesn\'t exist')
         return config
