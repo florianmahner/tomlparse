@@ -85,11 +85,6 @@ class ArgumentParser(argparse.ArgumentParser):
                 changed_dict.append(key)
         return changed_dict
 
-    def pop_keys_(self, namespace: argparse.Namespace, keys: List[Any]):
-        """Removes unnecessary keys from the namespace"""
-        for key in keys:
-            delattr(namespace, key)
-
     def load_toml(self, path: str) -> MutableMapping[str, Any]:
         try:
             config = toml.load(path)
@@ -115,8 +110,9 @@ class ArgumentParser(argparse.ArgumentParser):
         root_table = sys_args.root_table
         config = sys_args.config
 
-        self.pop_keys_(default_args, ["root_table", "table", "config"])
-        self.pop_keys_(sys_args, ["root_table", "table", "config"])
+        for key in ["root_table", "table", "config"]:
+            delattr(default_args, key)
+            delattr(sys_args, key)
 
         # These are the default arguments options updated by the command line
         if not config:

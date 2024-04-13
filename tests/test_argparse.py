@@ -57,23 +57,6 @@ class TestArgparse(unittest.TestCase):
         self.assertEqual(changed_args, ["config", "table"])
         self.assertIs(sys_args, namespace)
 
-    def test_pop_keys(self):
-        parser = argparse.ArgumentParser(description="Test ArgumentParser")
-        sys.argv = [
-            "test_argparse.py",
-            "--config",
-            "config.toml",
-            "--table",
-            "general",
-            "--root-table",
-            "main",
-        ]
-        default_args, sys_args = parser.extract_args()
-        changed_args = parser.find_changed_args(default_args, sys_args)
-        self.assertEqual(changed_args, ["config", "root_table", "table"])
-        parser.pop_keys_(sys_args, ["config", "table", "root_table"])
-        self.assertEqual(vars(sys_args), {})
-
     def test_remove_nested_keys(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
         sys.argv = [
@@ -88,7 +71,8 @@ class TestArgparse(unittest.TestCase):
         default_args, sys_args = parser.extract_args()
         changed_args = parser.find_changed_args(default_args, sys_args)
         self.assertEqual(changed_args, ["config", "root_table", "table"])
-        parser.pop_keys_(sys_args, ["config", "table", "root_table"])
+        for key in ["config", "table", "root_table"]:
+            delattr(sys_args, key)
         self.assertEqual(vars(sys_args), {})
         config = parser.load_toml("./tests/config.toml")
         self.assertEqual(
