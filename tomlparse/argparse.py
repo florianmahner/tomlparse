@@ -45,26 +45,19 @@ class ArgumentParser(argparse.ArgumentParser):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.add_argument(
-            "--config",
-            type=str,
-            default="",
-            help="Path to the configuration file.",
-        )
+        self.add_argument("--config", help="Path to the configuration file.")
         self.add_argument(
             "--root-table",
-            type=str,
-            default="",
-            help="""Table in the config file that counts for all expriments. If not specified, then these
-            are the top-level arguments without a [table]""",
+            help=(
+                "Table in the config file that counts for all expriments. If not"
+                " specified, then these are the top-level arguments without a [table]"
+            ),
         )
         self.add_argument(
             "--table",
-            type=str,
-            default="",
             help=(
-                "Table name in the config file to parse arguments in addition to"
-                " the root table"
+                "Table name in the config file to parse arguments in addition to the"
+                " root table"
             ),
         )
 
