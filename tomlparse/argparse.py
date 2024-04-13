@@ -62,12 +62,12 @@ class ArgumentParser(argparse.ArgumentParser):
         )
 
     def extract_args(
-        self, args: Optional[List[str]] = None
+        self, args: Optional[List[str]] = None, namespace: Optional[object] = None
     ) -> Tuple[argparse.Namespace, argparse.Namespace]:
         """Find the default arguments of the argument parser if any and the
         ones that are passed through the command line"""
         default_args = super().parse_args([])
-        cmdl_args = super().parse_args(args)
+        cmdl_args = super().parse_args(args, namespace)
 
         return default_args, cmdl_args
 
@@ -104,11 +104,13 @@ class ArgumentParser(argparse.ArgumentParser):
                 new_dict[key] = value
         return new_dict
 
-    def parse_args(self, args: Optional[List[str]] = None) -> argparse.Namespace:  # type: ignore[override]
+    def parse_args(
+        self, args: Optional[List[str]] = None, namespace: Optional[object] = None
+    ) -> argparse.Namespace:
         """Parse the arguments from the command line and the TOML file
         and return the updated arguments. Same functionality as the
         `argparse.ArgumentParser.parse_args` method."""
-        default_args, sys_args = self.extract_args(args)
+        default_args, sys_args = self.extract_args(args, namespace)
         table = sys_args.table
         root_table = sys_args.root_table
         config = sys_args.config

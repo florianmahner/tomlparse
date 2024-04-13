@@ -39,6 +39,24 @@ class TestArgparse(unittest.TestCase):
         changed_args = parser.find_changed_args(default_args, sys_args)
         self.assertEqual(changed_args, ["config", "table"])
 
+    def test_cmdl_with_namespace(self):
+        parser = argparse.ArgumentParser(description="Test ArgumentParser")
+        args = [
+            "--config",
+            "config.toml",
+            "--table",
+            "general",
+        ]
+
+        class Namespace:
+            pass
+
+        namespace = Namespace()
+        default_args, sys_args = parser.extract_args(args, namespace)
+        changed_args = parser.find_changed_args(default_args, sys_args)
+        self.assertEqual(changed_args, ["config", "table"])
+        self.assertIs(sys_args, namespace)
+
     def test_pop_keys(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
         sys.argv = [
@@ -107,6 +125,24 @@ class TestArgparse(unittest.TestCase):
         ]
         args = parser.parse_args()
         self.assertEqual(args.foo, 20)
+        self.assertEqual(args.bar, "hello")
+
+    def test_parse_args_with_namespace(self):
+        parser = argparse.ArgumentParser(description="Test ArgumentParser")
+        parser.add_argument("--foo", type=int, default=0)
+        parser.add_argument("--bar", type=str, default="")
+
+        class Namespace:
+            pass
+
+        namespace = Namespace()
+
+        args = parser.parse_args(
+            args=["--config", "./tests/config.toml"],
+            namespace=namespace,
+        )
+        self.assertIs(namespace, args)
+        self.assertEqual(args.foo, 10)
         self.assertEqual(args.bar, "hello")
 
     def test_missing_toml(self):
