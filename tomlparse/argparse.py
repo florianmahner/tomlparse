@@ -73,16 +73,16 @@ class ArgumentParser(argparse.ArgumentParser):
 
     def find_changed_args(
         self, default_args: argparse.Namespace, sys_args: argparse.Namespace
-    ) -> Dict[str, Any]:
+    ) -> List[str]:
         """Find the arguments that have been changed from the command
         line to replace the .toml arguments"""
         default_dict = vars(default_args)
         sys_dict = vars(sys_args)
-        changed_dict: Dict[str, Any] = {}
+        changed_dict = []
         for key, value in default_dict.items():
             sys_value = sys_dict[key]
             if sys_value != value:
-                changed_dict[key] = sys_value
+                changed_dict.append(key)
         return changed_dict
 
     def pop_keys_(self, namespace: argparse.Namespace, keys: List[Any]):
@@ -127,7 +127,7 @@ class ArgumentParser(argparse.ArgumentParser):
             try:
                 table_config = config[table]
             except KeyError:
-                self.error(f'No section "{table}" present in the configuration file')
+                self.error(f'No table "{table}" present in the configuration file')
 
         else:
             self.pop_keys_(sys_args, ["table"])

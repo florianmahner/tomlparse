@@ -12,7 +12,7 @@ class TestArgparse(unittest.TestCase):
         sys.argv = ["test_argparse.py"]
         default_args, sys_args = parser.extract_args()
         changed_args = parser.find_changed_args(default_args, sys_args)
-        self.assertEqual(changed_args, {})
+        self.assertEqual(changed_args, [])
 
     def test_cmdl_with_args(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
@@ -25,7 +25,7 @@ class TestArgparse(unittest.TestCase):
         ]
         default_args, sys_args = parser.extract_args()
         changed_args = parser.find_changed_args(default_args, sys_args)
-        self.assertEqual(changed_args, {"config": "config.toml", "table": "general"})
+        self.assertEqual(changed_args, ["config", "table"])
 
     def test_cmdl_with_args_as_param(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
@@ -37,7 +37,7 @@ class TestArgparse(unittest.TestCase):
         ]
         default_args, sys_args = parser.extract_args(args)
         changed_args = parser.find_changed_args(default_args, sys_args)
-        self.assertEqual(changed_args, {"config": "config.toml", "table": "general"})
+        self.assertEqual(changed_args, ["config", "table"])
 
     def test_pop_keys(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
@@ -52,10 +52,7 @@ class TestArgparse(unittest.TestCase):
         ]
         default_args, sys_args = parser.extract_args()
         changed_args = parser.find_changed_args(default_args, sys_args)
-        self.assertEqual(
-            changed_args,
-            {"config": "config.toml", "table": "general", "root_table": "main"},
-        )
+        self.assertEqual(changed_args, ["config", "root_table", "table"])
         parser.pop_keys_(sys_args, ["config", "table", "root_table"])
         self.assertEqual(vars(sys_args), {})
 
@@ -72,10 +69,7 @@ class TestArgparse(unittest.TestCase):
         ]
         default_args, sys_args = parser.extract_args()
         changed_args = parser.find_changed_args(default_args, sys_args)
-        self.assertEqual(
-            changed_args,
-            {"config": "config.toml", "table": "general", "root_table": "main"},
-        )
+        self.assertEqual(changed_args, ["config", "root_table", "table"])
         parser.pop_keys_(sys_args, ["config", "table", "root_table"])
         self.assertEqual(vars(sys_args), {})
         config = parser.load_toml("./tests/config.toml")
@@ -139,7 +133,7 @@ class TestArgparse(unittest.TestCase):
         with self.assertRaises(SystemExit), contextlib.redirect_stderr(stderr):
             parser.parse_args()
         self.assertIn(
-            'No section "missing" present in the configuration file',
+            'No table "missing" present in the configuration file',
             stderr.getvalue(),
         )
 
