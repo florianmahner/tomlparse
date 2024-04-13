@@ -153,7 +153,7 @@ class TestArgparse(unittest.TestCase):
         args = parser.parse_args()
         self.assertEqual(args.foo, 20)
         self.assertEqual(args.bar, "hey")
-        self.assertEqual(args.table, "main")
+        self.assertFalse(hasattr(args, "table"))
 
 
 if __name__ == "__main__":

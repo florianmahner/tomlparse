@@ -113,45 +113,49 @@ class ArgumentParser(argparse.ArgumentParser):
         root_table = sys_args.root_table
         config = sys_args.config
 
+        self.pop_keys_(default_args, ["root_table", "table", "config"])
+        self.pop_keys_(sys_args, ["root_table", "table", "config"])
+
         # These are the default arguments options updated by the command line
         if not config:
-            self.pop_keys_(sys_args, ["root_table", "table", "config"])
             return sys_args
 
         # If a config file is passed, update the cmdl args with the config file unless
         # the argument is already specified in the command line
-        config = self.load_toml(sys_args.config)
+        toml_data = self.load_toml(config)
         changed_args = self.find_changed_args(default_args, sys_args)
 
+        # Choose default values from TOML file, either from defined the
+        # root table or if there isn't one defined, from the items
+        # without a table.
+        if root_table:
+            if root_table not in toml_data:
+                self.error(
+                    f'Specified root table "{root_table}" doesn\'t exist in the'
+                    " configuration file"
+                )
+
+            default_toml_args = toml_data[root_table]
+        else:
+            default_toml_args = self.remove_nested_keys(toml_data)
+
+        # Choose the values to overwrite default values from the TOML
+        # file, either from the defined table or if there isn't one
+        # defined, from the items without a table.
         if table:
-            try:
-                table_config = config[table]
-            except KeyError:
+            if table not in toml_data:
                 self.error(f'No table "{table}" present in the configuration file')
 
+            toml_args = toml_data[table]
         else:
-            self.pop_keys_(sys_args, ["table"])
-            table_config = config
-            table_config = self.remove_nested_keys(table_config)
+            toml_args = self.remove_nested_keys(toml_data)
 
-        # If not empty and there exists a table and a root table, select the root
-        #  table config
-        if config.get(root_table):
-            table_config.update(config[root_table])
-        # Else merge the content without a table header
-        else:
-            config = self.remove_nested_keys(config)
-            for key, value in config.items():
-                if (
-                    key not in table_config
-                ):  # we assing priority to the table if specified
-                    table_config[key] = value
+        toml_args_with_defaults = {**default_toml_args, **toml_args}
 
-        # Overwrite the TOML config with the command line arguments
-        for key, value in table_config.items():
-            if key in changed_args:
-                table_config[key] = changed_args[key]
-            else:
+        # Replaced unchanged command line arguments with arguments from
+        # the TOML file.
+        for key, value in toml_args_with_defaults.items():
+            if key not in changed_args:
                 setattr(sys_args, key, value)
 
         return sys_args
