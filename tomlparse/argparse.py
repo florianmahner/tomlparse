@@ -95,8 +95,8 @@ class ArgumentParser(argparse.ArgumentParser):
     def load_toml(self, path: str) -> MutableMapping[str, Any]:
         try:
             config = toml.load(path)
-        except FileNotFoundError as f:
-            raise FileNotFoundError from f
+        except FileNotFoundError:
+            self.error(f'Configuration file "{path}" doesn\'t exist')
         return config
 
     def remove_nested_keys(self, dictionary: Dict[str, Any]) -> Dict[str, Any]:
@@ -128,8 +128,8 @@ class ArgumentParser(argparse.ArgumentParser):
         if table:
             try:
                 table_config = config[table]
-            except KeyError as key:
-                raise KeyError from key
+            except KeyError:
+                self.error(f'No section "{table}" present in the configuration file')
 
         else:
             self.pop_keys_(sys_args, ["table"])

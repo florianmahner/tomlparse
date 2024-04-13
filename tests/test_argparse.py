@@ -1,5 +1,7 @@
+import contextlib
 import sys
 import unittest
+from io import StringIO
 
 from tomlparse import argparse
 
@@ -116,8 +118,13 @@ class TestArgparse(unittest.TestCase):
     def test_missing_toml(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
         sys.argv = ["test_argparse.py", "--config", "./tests/missing.toml"]
-        with self.assertRaises(FileNotFoundError):
+        stderr = StringIO()
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(stderr):
             parser.parse_args()
+        self.assertIn(
+            'Configuration file "./tests/missing.toml" doesn\'t exist',
+            stderr.getvalue(),
+        )
 
     def test_missing_section(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
@@ -128,8 +135,13 @@ class TestArgparse(unittest.TestCase):
             "--table",
             "missing",
         ]
-        with self.assertRaises(KeyError):
+        stderr = StringIO()
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(stderr):
             parser.parse_args()
+        self.assertIn(
+            'No section "missing" present in the configuration file',
+            stderr.getvalue(),
+        )
 
     def test_combined_section(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
