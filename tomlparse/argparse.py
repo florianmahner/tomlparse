@@ -1,9 +1,9 @@
 """
 Module for parsing command line arguments and TOML configuration files.
 
-This module provides a class, `ArgumentParser`, which extends the functionality 
-of `argparse.ArgumentParser` by allowing users to specify default values for 
-arguments in a TOML file, in addition to the command line. 
+This module provides a class, `ArgumentParser`, which extends the functionality
+of `argparse.ArgumentParser` by allowing users to specify default values for
+arguments in a TOML file, in addition to the command line.
 """
 
 import argparse
@@ -127,7 +127,7 @@ class ArgumentParser(argparse.ArgumentParser):
             self.pop_keys_(sys_args, ["root_table", "table", "config"])
             return sys_args
 
-        # If a config file is passed, upodate the cmdl args with the config file unless
+        # If a config file is passed, update the cmdl args with the config file unless
         # the argument is already specified in the command line
         config = self.load_toml(sys_args.config)
         changed_args = self.find_changed_args(default_args, sys_args)
