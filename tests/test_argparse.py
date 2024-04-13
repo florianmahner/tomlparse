@@ -65,7 +65,7 @@ class TestArgparse(unittest.TestCase):
         )
         parser.pop_keys_(sys_args, ["config", "table", "root_table"])
         self.assertEqual(vars(sys_args), {})
-        config = parser.load_from_toml("./tests/config.toml")
+        config = parser.load_toml("./tests/config.toml")
         self.assertEqual(
             config,
             {"foo": 10, "bar": "hello", "general": {"foo": 20}, "main": {"bar": "hey"}},
@@ -119,23 +119,6 @@ class TestArgparse(unittest.TestCase):
         ]
         with self.assertRaises(KeyError):
             parser.parse_args()
-
-    def test_write_to_toml(self):
-        parser = argparse.ArgumentParser(description="Test ArgumentParser")
-        sys.argv = [
-            "test_argparse.py",
-            "--config",
-            "./tests/config.toml",
-            "--table",
-            "general",
-        ]
-        parser.add_argument("--foo", type=int, default=0)
-        parser.add_argument("--bar", type=str, default="")
-        args = parser.parse_args()
-        parser.write_to_toml(vars(args), "./tests/test_config.toml")
-        config = parser.load_from_toml("./tests/test_config.toml")
-        os.remove("./tests/test_config.toml")
-        self.assertEqual(vars(args), config)
 
     def test_combined_section(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")

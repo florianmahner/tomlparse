@@ -166,10 +166,3 @@ class ArgumentParser(argparse.ArgumentParser):
                 setattr(sys_args, key, value)
 
         return sys_args
-
-    def write_to_toml(self, args: Dict[str, Any], path: str) -> None:
-        with open(path, "w") as f:
-            toml.dump(args, f)
-
-    def load_from_toml(self, path: str) -> MutableMapping[str, Any]:
-        return self.load_toml(path)
