@@ -89,7 +89,7 @@ class ArgumentParser(argparse.ArgumentParser):
         return changed_dict
 
     def load_toml(self, path: str) -> MutableMapping[str, Any]:
-        try:    
+        try:
             config = tomllib.load(path)
         except FileNotFoundError:
             self.error(f'Configuration file "{path}" doesn\'t exist')
