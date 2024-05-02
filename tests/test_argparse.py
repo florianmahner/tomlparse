@@ -1,6 +1,7 @@
-import os
+import contextlib
 import sys
 import unittest
+from io import StringIO
 
 from tomlparse import argparse
 
@@ -11,7 +12,7 @@ class TestArgparse(unittest.TestCase):
         sys.argv = ["test_argparse.py"]
         default_args, sys_args = parser.extract_args()
         changed_args = parser.find_changed_args(default_args, sys_args)
-        self.assertEqual(changed_args, {})
+        self.assertEqual(changed_args, [])
 
     def test_cmdl_with_args(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
@@ -24,27 +25,37 @@ class TestArgparse(unittest.TestCase):
         ]
         default_args, sys_args = parser.extract_args()
         changed_args = parser.find_changed_args(default_args, sys_args)
-        self.assertEqual(changed_args, {"config": "config.toml", "table": "general"})
+        self.assertEqual(changed_args, ["config", "table"])
 
-    def test_pop_keys(self):
+    def test_cmdl_with_args_as_param(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
-        sys.argv = [
-            "test_argparse.py",
+        args = [
             "--config",
             "config.toml",
             "--table",
             "general",
-            "--root-table",
-            "main",
         ]
-        default_args, sys_args = parser.extract_args()
+        default_args, sys_args = parser.extract_args(args)
         changed_args = parser.find_changed_args(default_args, sys_args)
-        self.assertEqual(
-            changed_args,
-            {"config": "config.toml", "table": "general", "root_table": "main"},
-        )
-        parser.pop_keys_(sys_args, ["config", "table", "root_table"])
-        self.assertEqual(vars(sys_args), {})
+        self.assertEqual(changed_args, ["config", "table"])
+
+    def test_cmdl_with_namespace(self):
+        parser = argparse.ArgumentParser(description="Test ArgumentParser")
+        args = [
+            "--config",
+            "config.toml",
+            "--table",
+            "general",
+        ]
+
+        class Namespace:
+            pass
+
+        namespace = Namespace()
+        default_args, sys_args = parser.extract_args(args, namespace)
+        changed_args = parser.find_changed_args(default_args, sys_args)
+        self.assertEqual(changed_args, ["config", "table"])
+        self.assertIs(sys_args, namespace)
 
     def test_remove_nested_keys(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
@@ -59,13 +70,11 @@ class TestArgparse(unittest.TestCase):
         ]
         default_args, sys_args = parser.extract_args()
         changed_args = parser.find_changed_args(default_args, sys_args)
-        self.assertEqual(
-            changed_args,
-            {"config": "config.toml", "table": "general", "root_table": "main"},
-        )
-        parser.pop_keys_(sys_args, ["config", "table", "root_table"])
+        self.assertEqual(changed_args, ["config", "root_table", "table"])
+        for key in ["config", "table", "root_table"]:
+            delattr(sys_args, key)
         self.assertEqual(vars(sys_args), {})
-        config = parser.load_from_toml("./tests/config.toml")
+        config = parser.load_toml("./tests/config.toml")
         self.assertEqual(
             config,
             {"foo": 10, "bar": "hello", "general": {"foo": 20}, "main": {"bar": "hey"}},
@@ -102,11 +111,34 @@ class TestArgparse(unittest.TestCase):
         self.assertEqual(args.foo, 20)
         self.assertEqual(args.bar, "hello")
 
+    def test_parse_args_with_namespace(self):
+        parser = argparse.ArgumentParser(description="Test ArgumentParser")
+        parser.add_argument("--foo", type=int, default=0)
+        parser.add_argument("--bar", type=str, default="")
+
+        class Namespace:
+            pass
+
+        namespace = Namespace()
+
+        args = parser.parse_args(
+            args=["--config", "./tests/config.toml"],
+            namespace=namespace,
+        )
+        self.assertIs(namespace, args)
+        self.assertEqual(args.foo, 10)
+        self.assertEqual(args.bar, "hello")
+
     def test_missing_toml(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
         sys.argv = ["test_argparse.py", "--config", "./tests/missing.toml"]
-        with self.assertRaises(FileNotFoundError):
+        stderr = StringIO()
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(stderr):
             parser.parse_args()
+        self.assertIn(
+            'Configuration file "./tests/missing.toml" doesn\'t exist',
+            stderr.getvalue(),
+        )
 
     def test_missing_section(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
@@ -117,25 +149,13 @@ class TestArgparse(unittest.TestCase):
             "--table",
             "missing",
         ]
-        with self.assertRaises(KeyError):
+        stderr = StringIO()
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(stderr):
             parser.parse_args()
-
-    def test_write_to_toml(self):
-        parser = argparse.ArgumentParser(description="Test ArgumentParser")
-        sys.argv = [
-            "test_argparse.py",
-            "--config",
-            "./tests/config.toml",
-            "--table",
-            "general",
-        ]
-        parser.add_argument("--foo", type=int, default=0)
-        parser.add_argument("--bar", type=str, default="")
-        args = parser.parse_args()
-        parser.write_to_toml(vars(args), "./tests/test_config.toml")
-        config = parser.load_from_toml("./tests/test_config.toml")
-        os.remove("./tests/test_config.toml")
-        self.assertEqual(vars(args), config)
+        self.assertIn(
+            'No table "missing" present in the configuration file',
+            stderr.getvalue(),
+        )
 
     def test_combined_section(self):
         parser = argparse.ArgumentParser(description="Test ArgumentParser")
@@ -153,7 +173,7 @@ class TestArgparse(unittest.TestCase):
         args = parser.parse_args()
         self.assertEqual(args.foo, 20)
         self.assertEqual(args.bar, "hey")
-        self.assertEqual(args.table, "main")
+        self.assertFalse(hasattr(args, "table"))
 
 
 if __name__ == "__main__":
