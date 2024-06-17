@@ -119,4 +119,5 @@ python experiment.py --config "example.toml" --table "general" --foo 100
 Please have a look at the contribution guidlines in `Contributing.rst`.
 
 ---
+
 Repository initiated with [fpgmaas/cookiecutter-poetry](https://github.com/fpgmaas/cookiecutter-poetry).
