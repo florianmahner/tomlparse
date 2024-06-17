@@ -92,6 +92,8 @@ ignore = [
 
 [tool.ruff.per-file-ignores]
 "tests/*" = ["S101"]
+"**/__init__.py" = ["ALL"]
+
 
 [tool.coverage.report]
 skip_empty = true
