@@ -35,6 +35,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         env_vars: OS,PYTHON
+        version: "v0.1.15"
         fail_ci_if_error: true
         flags: unittests
         files: ./coverage.xml
