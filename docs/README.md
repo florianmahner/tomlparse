@@ -45,8 +45,8 @@ bar = "hello"
 At the core of this module is the  [TOML ArgumentParser](https://github.com/florianmahner/toml-argparse/blob/main/tomlparse/argparse.py), a simple wrapper of the original argparse module. To use the TOML arguments for our project, we we would create an `ArgumentParser` as usual:
 
 ```python
-from tomlparse import argparse
-parser = argparse.ArgumentParser()
+import tomlparse
+parser = tomlparse.ArgumentParser()
 parser.add_argument("--foo", type-int, default=0)
 parser.add_argument("--bar", type=str, default="")
 parser.parse_args()
@@ -119,4 +119,5 @@ python experiment.py --config "example.toml" --table "general" --foo 100
 Please have a look at the contribution guidlines in `Contributing.rst`.
 
 ---
+
 Repository initiated with [fpgmaas/cookiecutter-poetry](https://github.com/fpgmaas/cookiecutter-poetry).
