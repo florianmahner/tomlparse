@@ -1,5 +1,8 @@
 # tomlparse
 
+
+<img src="logo.png" alt="tomlparse logo" width="150"/>
+
 [![Release](https://img.shields.io/github/v/release/florianmahner/tomlparse)](https://img.shields.io/github/v/release/florianmahner/tomlparse)
 [![Build status](https://img.shields.io/github/actions/workflow/status/florianmahner/tomlparse/main.yml?branch=main)](https://github.com/florianmahner/toml-argparse/actions/workflows/main.yml?query=branch%3Amain)
 ![example workflow](https://github.com/florianmahner/tomlparse/actions/workflows/main.yml/badge.svg)
