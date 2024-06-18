@@ -1,7 +1,6 @@
-# tomlparse
+# tomlparse 
 
-
-<img src="logo.png" alt="tomlparse logo" width="150"/>
+<a href="https://github.com/florianmahner/tomlparse/blob/main/docs/logo.png?raw=true"><img src="https://github.com/florianmahner/tomlparse/blob/main/docs/logo.png?raw=true" width="300" align="right" /></a>
 
 [![Release](https://img.shields.io/github/v/release/florianmahner/tomlparse)](https://img.shields.io/github/v/release/florianmahner/tomlparse)
 [![Build status](https://img.shields.io/github/actions/workflow/status/florianmahner/tomlparse/main.yml?branch=main)](https://github.com/florianmahner/toml-argparse/actions/workflows/main.yml?query=branch%3Amain)
@@ -10,8 +9,7 @@
 [![License](https://img.shields.io/github/license/florianmahner/tomlparse)](https://img.shields.io/github/license/florianmahner/tomlparse)
 ![code style](https://img.shields.io/badge/code%20style-black-black)
 
-
-tomlparse is a Python library and command-line tool that allows you to use [TOML](https://toml.io/en/) configuration files in conjunction with the [argparse module](https://docs.python.org/3/library/argparse.html). It provides a simple and convenient way to handle your python projects, leveraging the strengths of both TOML and argparse.
+tomlparse is a Python library and command-line tool that allows you to use <a href="https://toml.io/en/">TOML</a> configuration files in conjunction with the <a href="https://docs.python.org/3/library/argparse.html">argparse module</a>. It provides a simple and convenient way to handle your python projects, leveraging the strengths of both TOML and argparse.
 
 
 # :notebook_with_decorative_cover: Table of Contents
