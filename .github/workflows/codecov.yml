@@ -41,3 +41,6 @@ jobs:
         files: ./coverage.xml
         name: codecov-umbrella
         verbose: true
+    - name: Check coverage threshold
+      run: |
+          coverage report --fail-under=90
