@@ -12,7 +12,7 @@ from typing import Any, Dict, List, MutableMapping, Optional, Tuple
 try:
     import tomllib
 except ImportError:
-    import toml as tomllib
+    import tomli as tomllib
 
 
 class ArgumentParser(argparse.ArgumentParser):
@@ -90,7 +90,8 @@ class ArgumentParser(argparse.ArgumentParser):
 
     def load_toml(self, path: str) -> MutableMapping[str, Any]:
         try:
-            config = tomllib.load(path)
+            with open(path, "rb") as f:
+                config = tomllib.load(f)
         except FileNotFoundError:
             self.error(f'Configuration file "{path}" doesn\'t exist')
         return config
