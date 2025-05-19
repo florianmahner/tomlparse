@@ -1,163 +1,135 @@
-"""
-Module for parsing command line arguments and TOML configuration files.
-
-This module provides a class, `ArgumentParser`, which extends the functionality
-of `argparse.ArgumentParser` by allowing users to specify default values for
-arguments in a TOML file, in addition to the command line.
-"""
-
 import argparse
-from typing import Any, Dict, List, MutableMapping, Optional, Tuple
+from typing import Any, Dict, List, MutableMapping, Optional
 
 try:
-    import tomllib
+    import tomllib  # python ≥ 3.11
 except ImportError:
     import tomli as tomllib
 
 
+"""
+Module for parsing command-line arguments and TOML configuration files.
+
+It exposes :class:`ArgumentParser`, a thin wrapper around
+:class:`argparse.ArgumentParser` that lets values defined in a TOML file act
+as *defaults* for ordinary command-line options.
+
+Precedence (highest first):
+
+1. command-line flags
+2. keys inside the table given via ``--table``
+3. keys inside the table given via ``--root-table`` **or** the global keys
+4. defaults supplied via :pymeth:`add_argument`
+"""
+
+
 class ArgumentParser(argparse.ArgumentParser):
-    """A wrapper of the argparse.ArgumentParser class that adds the ability to
-    specify the values for arguments using a TOML file.
-
-    This class extends the functionality of the standard argparse.ArgumentParser by allowing
-    users to specify default values for arguments in a TOML file, in addition to the command line.
-    We can use all functionalities from the argument parser as usual:
-
-    Example:
-        >>> from tomlparse import argparse
-        >>> parser = argparse.ArgumentParser(description='Example argparse-toml app')
-        >>> parser.add_argument('--foo', type=int, help='An example argument')
-        >>> args = parser.parse_args()
-
-    The above code will work as with the standard argparse.ArgumentParser class. We can also
-    specify the default values for the arguments in a TOML file. For this the TOML ArgumentParser
-    has two additional arguments: `--config` and `--table`. The `--config` argument is used
-    to specify the path to the TOML file, and the `--table` argument is used to specify the
-    table name in the TOML file to parse the arguments from. A TOML table is defined by a [name]
-    in brackets preceding the arguments. If the `--table` argument is not specified, the arguments
-    are parsed from the root table of the TOML file. We can also change
-    the root table name by specifying the `--root_table` argument.
-
-    We have the following hierarchy of arguments:
-        1. Arguments passed through the command line are selected over TOML
-           arguments, even if both are passed
-        2. Arguments from the TOML file are preferred over the default arguments
-        3. Arguments from the TOML with a table override the arguments without
-           a table
-    """
+    """Like :class:`argparse.ArgumentParser`, but with TOML awareness."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.add_argument("--config", help="Path to the configuration file.")
+
+        # helper flags (not meant for the target script itself)
+        self.add_argument("--toml", help="Path to the TOML file.")
         self.add_argument(
             "--root-table",
             help=(
-                "Table in the config file that counts for all expriments. If not"
-                " specified, then these are the top-level arguments without a [table]"
+                "TOML table whose keys act as global defaults. "
+                "If omitted, top-level keys are used."
             ),
         )
         self.add_argument(
             "--table",
             help=(
-                "Table name in the config file to parse arguments in addition to the"
-                " root table"
+                "Extra TOML table whose keys override those coming from the "
+                "root table (or from the top level)."
             ),
         )
 
-    def extract_args(
-        self, args: Optional[List[str]] = None, namespace: Optional[object] = None
-    ) -> Tuple[argparse.Namespace, argparse.Namespace]:
-        """Find the default arguments of the argument parser if any and the
-        ones that are passed through the command line"""
-        default_args = super().parse_args([])
-        cmdl_args = super().parse_args(args, namespace)
-
-        return default_args, cmdl_args
-
-    def find_changed_args(
-        self, default_args: argparse.Namespace, sys_args: argparse.Namespace
-    ) -> List[str]:
-        """Find the arguments that have been changed from the command
-        line to replace the .toml arguments"""
-        default_dict = vars(default_args)
-        sys_dict = vars(sys_args)
-        changed_dict = []
-        for key, value in default_dict.items():
-            sys_value = sys_dict[key]
-            if sys_value != value:
-                changed_dict.append(key)
-        return changed_dict
+    def flatten(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Return *data* with nested tables removed, only leaf values stay."""
+        return {k: v for k, v in data.items() if not isinstance(v, dict)}
 
     def load_toml(self, path: str) -> MutableMapping[str, Any]:
+        """Read *path* and return the parsed TOML mapping."""
         try:
             with open(path, "rb") as f:
-                config = tomllib.load(f)
+                return tomllib.load(f)
         except FileNotFoundError:
-            self.error(f'Configuration file "{path}" doesn\'t exist')
-        return config
+            self.error(f"TOML file {path} does not exist")
 
-    def remove_nested_keys(self, dictionary: Dict[str, Any]) -> Dict[str, Any]:
-        new_dict = {}
-        for key, value in dictionary.items():
-            if not isinstance(value, dict):
-                new_dict[key] = value
-        return new_dict
+    def add_arguments_from_toml(
+        self,
+        toml_path: str,
+        root_table: Optional[str],
+        table: Optional[str],
+    ) -> None:
+        """Add/override arguments according to *toml_path* and helper flags."""
+        toml_data = self.load_toml(toml_path)
 
-    def parse_args(
-        self, args: Optional[List[str]] = None, namespace: Optional[object] = None
-    ) -> argparse.Namespace:
-        """Parse the arguments from the command line and the TOML file
-        and return the updated arguments. Same functionality as the
-        `argparse.ArgumentParser.parse_args` method."""
-        default_args, sys_args = self.extract_args(args, namespace)
-        table = sys_args.table
-        root_table = sys_args.root_table
-        config = sys_args.config
-
-        for key in ["root_table", "table", "config"]:
-            delattr(default_args, key)
-            delattr(sys_args, key)
-
-        # These are the default arguments options updated by the command line
-        if not config:
-            return sys_args
-
-        # If a config file is passed, update the cmdl args with the config file unless
-        # the argument is already specified in the command line
-        toml_data = self.load_toml(config)
-        changed_args = self.find_changed_args(default_args, sys_args)
-
-        # Choose default values from TOML file, either from defined the
-        # root table or if there isn't one defined, from the items
-        # without a table.
+        # 1) defaults - either the requested root-table or the top level
         if root_table:
             if root_table not in toml_data:
-                self.error(
-                    f'Specified root table "{root_table}" doesn\'t exist in the'
-                    " configuration file"
-                )
-
-            default_toml_args = toml_data[root_table]
+                self.error(f"Specified root table {root_table} does not exist")
+            base_defaults = self.flatten(toml_data[root_table])
+            # Add any top-level keys that aren't in the root table
+            top_level_defaults = self.flatten(toml_data)
+            # Use top-level keys as fallback when not in root table
+            for key, value in top_level_defaults.items():
+                if key not in base_defaults:
+                    base_defaults[key] = value
         else:
-            default_toml_args = self.remove_nested_keys(toml_data)
+            base_defaults = self.flatten(toml_data)
 
-        # Choose the values to overwrite default values from the TOML
-        # file, either from the defined table or if there isn't one
-        # defined, from the items without a table.
+        # 2) optional overrides - either the requested table or the top level
         if table:
             if table not in toml_data:
-                self.error(f'No table "{table}" present in the configuration file')
-
-            toml_args = toml_data[table]
+                self.error(f"Specified table {table} does not exist")
+            override_defaults = self.flatten(toml_data[table])
         else:
-            toml_args = self.remove_nested_keys(toml_data)
+            override_defaults = {}
 
-        toml_args_with_defaults = {**default_toml_args, **toml_args}
+        final_defaults = {**base_defaults, **override_defaults}
 
-        # Replaced unchanged command line arguments with arguments from
-        # the TOML file.
-        for key, value in toml_args_with_defaults.items():
-            if key not in changed_args:
-                setattr(sys_args, key, value)
+        for key, value in final_defaults.items():
+            # already present? → update its default
+            existing_action = next(
+                (act for act in self._actions if act.dest == key), None
+            )
+            if existing_action is not None:
+                existing_action.default = value
+                continue
 
-        return sys_args
+            # new argument inferred from TOML
+            if isinstance(value, bool):
+                action = "store_false" if value else "store_true"
+                self.add_argument(f"--{key}", action=action, default=value)
+            else:
+                self.add_argument(f"--{key}", type=type(value), default=value)
+
+    def parse_args(
+        self,
+        args: Optional[List[str]] = None,
+        namespace: Optional[argparse.Namespace] = None,
+    ) -> argparse.Namespace:
+        """Parse *args* taking TOML defaults into account."""
+        # first, sniff helper flags using a *fresh* namespace so that the
+        # user-supplied namespace is not polluted with interim defaults
+        helpers, _ = super().parse_known_args(args=args)
+
+        if helpers.toml:
+            self.add_arguments_from_toml(
+                toml_path=helpers.toml,
+                root_table=helpers.root_table,
+                table=helpers.table,
+            )
+
+        # final parse - now with all dynamic arguments added
+        result_ns = super().parse_args(args=args, namespace=namespace)
+
+        # remove helper flags from the public namespace
+        for attr in ("toml", "root_table", "table"):
+            if hasattr(result_ns, attr):
+                delattr(result_ns, attr)
+
+        return result_ns
