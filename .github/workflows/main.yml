@@ -52,7 +52,7 @@ jobs:
         with:
           path: .tox
           key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
-
+          
       - name: Install tox
         run: |
           python -m pip install --upgrade pip
@@ -60,11 +60,17 @@ jobs:
 
       - name: Test with tox
         run: tox
-      
+
+      - name: Workaround for missing upload-artifact info
+        uses: actions/upload-artifact@v3
+        with:
+          name: dummy
+          path: README.md
+        continue-on-error: true
+
       - name: Upload coverage reports to Codecov with GitHub Action on Python 3.11
         uses: codecov/codecov-action@v3
         if: ${{ matrix.python-version == '3.9' }}
-
   check-docs:
     runs-on: ubuntu-latest
     steps:
