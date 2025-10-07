@@ -12,7 +12,7 @@
 tomlparse is a Python library and command-line tool that allows you to use <a href="https://toml.io/en/">TOML</a> configuration files in conjunction with the <a href="https://docs.python.org/3/library/argparse.html">argparse module</a>. It provides a simple and convenient way to handle your python projects, leveraging the strengths of both TOML and argparse.
 
 
-# :notebook_with_decorative_cover: Table of Contents
+# 📝 Table of Contents
 1. [Installation](#installation)
 2. [Usage](#usage)
     1. [Basic Example](#basic-example)
@@ -20,7 +20,7 @@ tomlparse is a Python library and command-line tool that allows you to use <a hr
 5. [Contributing](#contributing)
 
 
-## :computer: How to install
+## 💻 How to install
 
 You can install the library using pip
 
@@ -29,11 +29,11 @@ pip install tomlparse
 ```
 
 
-## :mag: How to use
+## 🔍 How to use
 
 Using tomlparse is straightforward and requires only a few extra steps compared to using argparse alone.
 
-### :snake: Basic Example
+### 🐍 Basic Example
 
 You first define your configuration options in a TOML file. TOML files are highly flexible and include a lot of native types. Have look [here](https://toml.io/en/v1.0.0) for an extensive list.  TOML files usually come in the following form:
 
@@ -61,7 +61,7 @@ python experiment.py --config "example.toml"
 
 This will replace the default values from the ArgumentParser with the TOML values.
 
-### :snake: Extended Example
+### 🐍 Extended Example
 
 TOML files have the ability to separate arguments into different sections (called `tables`), which are represented by nested dictionaries:
 
@@ -115,7 +115,7 @@ python experiment.py --config "example.toml" --table "general" --foo 100
 ```
 
 
-## :blossom: Contributing
+## 🌸 Contributing
 
 Please have a look at the contribution guidlines in `Contributing.rst`.
 
