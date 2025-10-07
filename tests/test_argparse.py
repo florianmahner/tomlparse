@@ -137,6 +137,35 @@ class TestArgumentParser(unittest.TestCase):
             result = tomlparse.argparse._load_toml_backend()
         self.assertIs(result, fallback)
 
+    def test_invalid_toml_syntax(self):
+        parser = tomlparse.ArgumentParser(description="Test ArgumentParser")
+        stderr = StringIO()
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(stderr):
+            parser.parse_args(["--toml", str(Path("tests/invalid_syntax.toml"))])
+        self.assertIn("Failed to parse TOML file", stderr.getvalue())
+
+    def test_missing_root_table(self):
+        parser = tomlparse.ArgumentParser(description="Test ArgumentParser")
+        stderr = StringIO()
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(stderr):
+            parser.parse_args(
+                [
+                    "--toml",
+                    str(Path("tests/config.toml")),
+                    "--root-table",
+                    "nonexistent",
+                ]
+            )
+        self.assertIn("Root table 'nonexistent' not found", stderr.getvalue())
+
+    def test_unsupported_toml_type(self):
+        parser = tomlparse.ArgumentParser(description="Test ArgumentParser")
+        stderr = StringIO()
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(stderr):
+            parser.parse_args(["--toml", str(Path("tests/unsupported_type.toml"))])
+        self.assertIn("Unsupported TOML value type", stderr.getvalue())
+        self.assertIn("unsupported", stderr.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()
