@@ -61,9 +61,7 @@ class TestArgumentParser(unittest.TestCase):
         missing_path = "./tests/missing.toml"
         with self.assertRaises(SystemExit), contextlib.redirect_stderr(stderr):
             parser.parse_args(["--toml", missing_path])
-        self.assertIn(
-            "TOML file ./tests/missing.toml does not exist", stderr.getvalue()
-        )
+        self.assertIn("TOML file not found", stderr.getvalue())
 
     def test_missing_table(self):
         parser = tomlparse.ArgumentParser(description="Test ArgumentParser")
@@ -77,7 +75,7 @@ class TestArgumentParser(unittest.TestCase):
                     "missing",
                 ]
             )
-        self.assertIn("Specified table missing does not exist", stderr.getvalue())
+        self.assertIn("Table 'missing' not found", stderr.getvalue())
 
     def test_combined_root_and_table(self):
         parser = tomlparse.ArgumentParser(description="Test ArgumentParser")
