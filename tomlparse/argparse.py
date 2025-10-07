@@ -1,7 +1,17 @@
 import argparse
 from importlib import import_module
 from pathlib import Path
-from typing import Any, Dict, Mapping, MutableMapping, Optional, Sequence, TypeVar, cast
+from typing import (
+    Any,
+    Dict,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+    cast,
+)
 
 
 def _load_toml_backend() -> Any:
@@ -123,7 +133,7 @@ class ArgumentParser(argparse.ArgumentParser):
         self,
         args: Optional[Sequence[str]] = None,
         namespace: Optional[_Namespace] = None,
-    ) -> argparse.Namespace | _Namespace:
+    ) -> Union[argparse.Namespace, _Namespace]:
         """Parse *args* taking TOML defaults into account."""
         # first, sniff helper flags using a *fresh* namespace so that the
         # user-supplied namespace is not polluted with interim defaults
