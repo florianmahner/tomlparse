@@ -1,10 +1,17 @@
 import argparse
-from typing import Any, Dict, List, MutableMapping, Optional
+from importlib import import_module
+from pathlib import Path
+from typing import Any, Dict, Mapping, MutableMapping, Optional, Sequence, TypeVar, cast
 
-try:
-    import tomllib  # python ≥ 3.11
-except ImportError:
-    import tomli as tomllib
+
+def _load_toml_backend() -> Any:
+    try:
+        return import_module("tomllib")
+    except ModuleNotFoundError:
+        return import_module("tomli")
+
+
+tomllib = _load_toml_backend()
 
 
 """
@@ -21,6 +28,9 @@ Precedence (highest first):
 3. keys inside the table given via ``--root-table`` **or** the global keys
 4. defaults supplied via :pymeth:`add_argument`
 """
+
+
+_Namespace = TypeVar("_Namespace", bound=argparse.Namespace)
 
 
 class ArgumentParser(argparse.ArgumentParser):
@@ -46,17 +56,19 @@ class ArgumentParser(argparse.ArgumentParser):
             ),
         )
 
-    def flatten(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def flatten(self, data: Mapping[str, Any]) -> Dict[str, Any]:
         """Return *data* with nested tables removed, only leaf values stay."""
         return {k: v for k, v in data.items() if not isinstance(v, dict)}
 
     def load_toml(self, path: str) -> MutableMapping[str, Any]:
         """Read *path* and return the parsed TOML mapping."""
+        file_path = Path(path)
+        original_path = path
         try:
-            with open(path, "rb") as f:
-                return tomllib.load(f)
+            with file_path.open("rb") as handle:
+                return cast(MutableMapping[str, Any], tomllib.load(handle))
         except FileNotFoundError:
-            self.error(f"TOML file {path} does not exist")
+            self.error(f"TOML file {original_path} does not exist")
 
     def add_arguments_from_toml(
         self,
@@ -107,11 +119,11 @@ class ArgumentParser(argparse.ArgumentParser):
             else:
                 self.add_argument(f"--{key}", type=type(value), default=value)
 
-    def parse_args(
+    def parse_args(  # type: ignore[override]
         self,
-        args: Optional[List[str]] = None,
-        namespace: Optional[argparse.Namespace] = None,
-    ) -> argparse.Namespace:
+        args: Optional[Sequence[str]] = None,
+        namespace: Optional[_Namespace] = None,
+    ) -> argparse.Namespace | _Namespace:
         """Parse *args* taking TOML defaults into account."""
         # first, sniff helper flags using a *fresh* namespace so that the
         # user-supplied namespace is not polluted with interim defaults
@@ -129,7 +141,6 @@ class ArgumentParser(argparse.ArgumentParser):
 
         # remove helper flags from the public namespace
         for attr in ("toml", "root_table", "table"):
-            if hasattr(result_ns, attr):
-                delattr(result_ns, attr)
+            result_ns.__dict__.pop(attr, None)
 
         return result_ns
