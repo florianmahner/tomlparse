@@ -53,10 +53,10 @@ parser.add_argument("--bar", type=str, default="")
 parser.parse_args()
 ```
 
-This is just a simple example with two arguments. But for larger projects with many hyperparameters, the number of arguments can quickly grow, and the TOML file provides an easy way to collect and store different hyperparameter configurations. Every TOML ArgumentParser has a `config` argument defined that we can pass using the following command-line syntax:
+This is just a simple example with two arguments. But for larger projects with many hyperparameters, the number of arguments can quickly grow, and the TOML file provides an easy way to collect and store different hyperparameter configurations. Every TOML ArgumentParser has a `toml` argument defined that we can pass using the following command-line syntax:
 
 ```bash
-python experiment.py --config "example.toml"
+python experiment.py --toml "example.toml"
 ```
 
 This will replace the default values from the ArgumentParser with the TOML values.
@@ -89,7 +89,7 @@ If we would load this TOML file as usual this would return a dict `{"foo": 10, "
 We can use these directly from the command-line:
 
 ```bash
-python experiment.py --config "example.toml" --table "general"
+python experiment.py --toml "example.toml" --table "general"
 ```
 
 Here the `root-table` is not defined. In this case the arguments at the top of the file without a table are taken and parsing would return the following dict `{"foo": 20, "bar": "hello"}`. Note that `table` arguments override arguments from the `root-table`. 
@@ -97,7 +97,7 @@ Here the `root-table` is not defined. In this case the arguments at the top of t
 We can also specify the root-table:
 
 ```bash
-python experiment.py --config "example.toml" --table "general" --root-table "root"
+python experiment.py --toml "example.toml" --table "general" --root-table "root"
 ```
 
 which would return the following dict `{"foo: 20", "bar": "hey"}` and override the arguments from the top of the TOML file.
@@ -111,7 +111,7 @@ In general, we have the following hierarchy of arguments:
 This means that we can also override arguments in the TOML file from the command-line:
 
 ```bash
-python experiment.py --config "example.toml" --table "general" --foo 100
+python experiment.py --toml "example.toml" --table "general" --foo 100
 ```
 
 
