@@ -4,7 +4,7 @@ import argparse
 from importlib import import_module
 from pathlib import Path
 from typing import Any, Final, Literal, Mapping, MutableMapping, Sequence, TypeVar, cast
-
+from collections import ChainMap
 
 def _load_toml_backend() -> Any:
     """Load tomllib (Python 3.11+) or fall back to tomli."""
@@ -141,7 +141,7 @@ class ArgumentParser(argparse.ArgumentParser):
         base_defaults = self._extract_leaf_values(toml_data[root_table])
         top_level_defaults = self._extract_leaf_values(toml_data)
 
-        return {**top_level_defaults, **base_defaults}
+        return ChainMap(base_defaults, top_level_defaults)
 
     def _extract_override_defaults(
         self,
@@ -248,7 +248,7 @@ class ArgumentParser(argparse.ArgumentParser):
 
         base_defaults = self._extract_base_defaults(toml_data, root_table)
         override_defaults = self._extract_override_defaults(toml_data, table)
-        final_defaults = {**base_defaults, **override_defaults}
+        final_defaults = ChainMap(override_defaults, base_defaults)
 
         self._apply_defaults(final_defaults)
 
