@@ -118,7 +118,7 @@ class ArgumentParser(argparse.ArgumentParser):
         self,
         toml_data: Mapping[str, Any],
         root_table: str | None,
-    ) -> dict[str, Any]:
+    ) -> ChainMap[str, Any]:
         """
         Extract base defaults from TOML data.
 
